@@ -15,6 +15,7 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
         <title>Code_Tokyo_Glow</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/atom-one-dark.min.css">
   </head>
   <body id="page-top">
         <!-- Masthead-->
@@ -29,24 +30,180 @@
         </header>
         <div class="container col-lg-7 horizontal-line-custom"></div>
         <!-- Code-->
-        <section class="about-section-custom text-center" id="Tokyo Glow Code">
+        <section class="about-section-custom" id="Tokyo Glow Code">
             <div class="container px-8 px-lg-10">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8">
-                        <h5 class="text-white">
+                        <h5 class="text-white text-center">
                             PlayerCarInput.cs
                         </h5>
-                        <img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_one.png" alt="..." width="250"/></br></br></br>
-                        <h5 class="text-white">
+                        <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_one.png" alt="..." width="250"/></br></br></br-->
+                        <pre>
+                            <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerCarInput : MonoBehaviour
+{
+    public float Power;
+    public float Angle;
+
+    public CarInput input;
+    public Wheel[] wheels;
+
+    private float throttleInput;
+    private float throttleDamp;
+
+    private float steeringInput;
+    private float steeringDamp;
+
+    public float dampenSpeed;
+    private KmhCounter kmhCounter;
+
+    [SerializeField] private bool IsPlayer2;
+
+    private void Awake()
+    {
+        kmhCounter = FindObjectOfType&lt;KmhCounter&gt;();
+        input = new CarInput();
+    }
+    private void OnEnable()
+    {
+        input.Enable();
+        if (!IsPlayer2)
+        {
+            input.Car.Throttle.performed += ApplyThrottle;
+            input.Car.Throttle.canceled += ReleaseThrottle;
+            input.Car.Steering.performed += ApplySteering;
+            input.Car.Steering.canceled += ReleaseSteering;
+        }
+        else
+        {
+            input.Car.ThrottleP2.performed += ApplyThrottle;
+            input.Car.ThrottleP2.canceled += ReleaseThrottle;
+            input.Car.SteeringP2.performed += ApplySteering;
+            input.Car.SteeringP2.canceled += ReleaseSteering;
+        }
+        
+    }
+    private void Update()
+    {
+        AngleBasedOnSpeed();
+        throttleDamp = DampenedInput(throttleInput, throttleDamp);
+        steeringDamp = DampenedInput(steeringInput, steeringDamp);
+    }
+    private void OnDisable()
+    {
+        input.Disable();
+    }
+    private float DampenedInput(float input, float output)
+    {
+        return Mathf.Lerp(output, input, Time.deltaTime * dampenSpeed);
+    }
+    private void ApplyThrottle(InputAction.CallbackContext value)
+    {
+        throttleInput = value.ReadValue&lt;float&gt;();
+    }
+    private void ReleaseThrottle(InputAction.CallbackContext value)
+    {
+        throttleInput = 0;
+    }
+
+    private void ApplySteering(InputAction.CallbackContext value)
+    {
+        steeringInput = value.ReadValue&lt;float&gt;();
+    }
+    private void ReleaseSteering(InputAction.CallbackContext value)
+    {
+        steeringInput = 0;
+    }
+
+    private void FixedUpdate()
+    {
+        foreach (Wheel wheel in wheels)
+        {
+            wheel.Accelerate(throttleDamp * Power);
+            wheel.Turn(steeringDamp * Angle);
+        }
+    }
+
+    private void AngleBasedOnSpeed()
+    {
+        Angle = 30 - kmhCounter.speed * 0.1f;
+    }
+}
+                            </code>
+                        </pre>
+                        <h5 class="text-white text-center">
                             Wheel.cs
                         </h5>
-                        <img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_two.png" alt="..." width="500"/>
-                        <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
-                        <a class="btn btn-primary" href="projects.html">Projects</a>
+                        <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_two.png" alt="..." width="500"/-->
+                        <pre>
+                            <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Wheel : MonoBehaviour
+{
+    public bool isPowered;
+    public bool canTurn;
+    public GameObject Visual;
+
+    public float steeringAngle;
+
+    private WheelCollider wheelCollider;
+
+    private void Start()
+    {
+        wheelCollider = GetComponent&lt;WheelCollider&gt;();
+    }
+
+    private void Update()
+    {
+        Vector3 position;
+        Quaternion rotation;
+        wheelCollider.GetWorldPose(out position, out rotation);
+        Visual.transform.position = position;
+    }
+
+    public void Accelerate(float power)
+    {
+        if (isPowered)
+        {
+            wheelCollider.motorTorque = power;
+        }
+    }
+
+    public void Turn(float angle)
+    {
+        if (canTurn)
+        {
+            wheelCollider.steerAngle = angle;
+        }
+    }
+
+    public void Brake(float power)
+    {
+        wheelCollider.brakeTorque = power;
+    }
+}
+                            </code>
+                        </pre>
+                        <div class="text-center">
+                            <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
+                            <a class="btn btn-primary" href="tokyo_glow.html">Tokyo Glow</a>
+                            <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
+                            <a class="btn btn-primary" href="index.html">Home Page</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
         <section class="padding-under-custom"></section>   
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
   </body>
 </html>
