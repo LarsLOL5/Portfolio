@@ -11263,3 +11263,21 @@ body {
 .mt-6 {
   margin-top: 6rem !important;
 }
+
+input[type=checkbox] {
+  display: none;
+}
+
+.zooming img {
+  margin: 10px;
+  filter: brightness(0.8);
+  transition: transform 0.25s ease;
+  cursor: zoom-in;
+}
+
+input[type=checkbox]:checked ~ label > img {
+  transform: scale(2);
+  cursor: zoom-out;
+  filter: brightness(1);
+  border: 10px solid #7ecbab;
+}
