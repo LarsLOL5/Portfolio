@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Code_Roman_Revenant</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <title>Code_Roman_Revenant</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/atom-one-dark.min.css">
+  </head>
+  <body id="page-top">
+        <!-- Masthead-->
+        <header class="masthead">
+            <div class="container px-lg-5 d-flex h-75 align-items-center justify-content-center">
+                <div class="d-flex justify-content-center">
+                    <div class="text-center">
+                        <h1 class="mx-auto my-0 text-uppercase">Code Roman Revenant</h1>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="container col-lg-7 horizontal-line-custom"></div>
+        <!-- Code-->
+        <section class="about-section-custom" id="Piggies Adventure Code">
+            <div class="container px-8 px-lg-10">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-lg-8">
+                        <h3 class="text-white text-center">
+                            InRadius System
+                        </h3></br>
+                        <h5 class="text-white text-center">
+                            InRadius.cs
+                        </h5>
+                        <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_one.png" alt="..." width="400"/></br></br>
+                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_two.png" alt="..." width="400"/-->
+                        <pre>
+                            <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InRadius : MonoBehaviour
+{
+    private MedKit medKit;
+    private Shield shield;
+    private KeycardPink keycardPink;
+    private KeycardRed keycardRed;
+    private KeycardGreen keycardGreen;
+    private Gun gun;
+    private UsbStick usbStick;
+    private Inventory inventory;
+    private UpgradesManager upgradesManager;
+    private PlayerHealth playerHealth;
+
+    private void Start()
+    {
+        medKit = FindObjectOfType&lt;MedKit&gt;();
+        shield = FindObjectOfType&lt;Shield&gt;();
+        keycardPink = FindObjectOfType&lt;KeycardPink&gt;();
+        keycardRed = FindObjectOfType&lt;KeycardRed&gt;();
+        keycardGreen = FindObjectOfType&lt;KeycardGreen&gt;();
+        gun = FindObjectOfType&lt;Gun&gt;();
+        usbStick = FindObjectOfType&lt;UsbStick&gt;();
+        inventory = FindObjectOfType&lt;Inventory&gt;();
+        upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
+        playerHealth = FindObjectOfType&lt;PlayerHealth&gt;();
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag(&quot;Medkit&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(other.GetComponent&lt;MedKit&gt;().Medkit());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;Ammo&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(other.GetComponent&lt;Ammo&gt;().PickUpAmmo());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;Shield&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(other.GetComponent&lt;Shield&gt;().ShieldEquip());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;Gun&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(gun.GunEquip());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;KeycardPink&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(keycardPink.PickUpKeycard());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;KeycardRed&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(keycardRed.PickUpKeycard());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;KeycardGreen&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                StartCoroutine(keycardGreen.PickUpKeycard());
+            }
+        }
+
+        if (other.gameObject.CompareTag(&quot;USB-Stick&quot;))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                inventory.USBStickAmount += 1;
+                if (upgradesManager.healingUSB == true)
+                {
+                    playerHealth.currentHealth += upgradesManager.healingUSBAmount; 
+                }
+                usbStick.OpenUSBScreen();
+
+                Destroy(other.gameObject);
+            }
+        }
+    }
+}
+                            </code>
+                        </pre>
+                        <h3 class="text-white text-center">
+                            Upgrade System
+                        </h3></br>
+                        <h5 class="text-white text-center">
+                            UpgradeNode.cs
+                        </h5>
+                        <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_three.png" alt="..." width="400"/></br></br-->
+                        <pre>
+                            <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public enum upgradeState
+{
+    locked, selectable, alreadyBought
+}
+
+public class UpgradeNode : MonoBehaviour
+{
+    [SerializeField] private UpgradeNode[] nextUpgrades;
+    [SerializeField] private upgradeState state;
+    private UpgradesManager upgradesManager;
+    private Inventory inventory;
+    [SerializeField] private int upgrades;
+
+    private void Awake()
+    {
+        upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
+        inventory = FindObjectOfType&lt;Inventory&gt;();
+    }
+
+    public void OnClickEnter()
+    {
+        if (inventory.USBStickAmount &lt;= 0)
+        {
+            return;
+        }
+
+        upgradesManager.SetState(upgrades, upgradeState.alreadyBought);
+        
+        foreach (UpgradeNode node in nextUpgrades)
+        {
+            if (upgradesManager.AllowedToActivate(node.upgrades))
+            {
+                node.GetComponent&lt;Button&gt;().interactable = true;
+            }
+        }
+        upgradesManager.Upgrades(upgrades);
+    }
+
+    public void SetStateToBought()
+    {
+        if (inventory.USBStickAmount &lt;= 0)
+        {
+            return;
+        }
+        inventory.USBStickAmount -= 1;
+        Button b = GetComponent&lt;Button&gt;();
+        ColorBlock cb = b.colors;
+
+        cb.disabledColor = Color.green;
+        b.colors = cb;
+
+        b.interactable = false;
+    }
+}
+                            </code>
+                        </pre>
+                        <h5 class="text-white text-center">
+                            UpgradesManager.cs
+                        </h5>
+                        <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_one.png" alt="..." width="400"/></br></br>
+                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_two.png" alt="..." width="400"/></br></br>
+                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_three.png" alt="..." width="400"/></br></br>
+                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_four.png" alt="..." width="400"/></br></br>
+                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_five.png" alt="..." width="400"/></br></br>
+                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_six.png" alt="..." width="400"/></br></br-->
+                        <pre>
+                            <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class UpgradesManager : MonoBehaviour
+{
+    public class upgradeData
+    {
+        public upgradeState state;
+        public int upgradeID;
+        public List&lt;int&gt; requiredNotes = new List&lt;int&gt;();
+        public string type = &quot;regular&quot;;
+    }
+
+    private PlayerHealth playerHealth;
+    private PlayerStats playerStats;
+    private EnemyStats enemyStats;
+    private Inventory inventory;
+    private PlayerMovement playerMovement;
+    private BurningDamage burningDamage;
+    private Overheating overheating;
+    private Immunity immunity;
+
+    private List&lt;upgradeData&gt; upgrades;
+    public bool healingUSB;
+    public int healingUSBAmount = 25;
+
+    [SerializeField] private List&lt;int&gt; updatesApplied = new List&lt;int&gt;();
+
+
+    private void Awake()
+    {
+        playerHealth = FindObjectOfType&lt;PlayerHealth&gt;();
+        playerStats = FindObjectOfType&lt;PlayerStats&gt;();
+        enemyStats = FindObjectOfType&lt;EnemyStats&gt;();
+        inventory = FindObjectOfType&lt;Inventory&gt;();
+        playerMovement = FindObjectOfType&lt;PlayerMovement&gt;();
+        burningDamage = FindObjectOfType&lt;BurningDamage&gt;();
+        overheating = FindObjectOfType&lt;Overheating&gt;();
+        immunity = FindObjectOfType&lt;Immunity&gt;();
+
+        upgrades = new List&lt;upgradeData&gt;();
+        for (int i = 0; i &lt; 27; i++)
+        {
+            upgradeData node = new upgradeData()
+            {
+                state = upgradeState.selectable,
+                upgradeID = i
+            };
+            upgrades.Add(node);
+        }
+
+        upgrades[2].requiredNotes.Add(0);
+
+        upgrades[3].requiredNotes.Add(0);
+        upgrades[3].requiredNotes.Add(1);
+
+        upgrades[4].requiredNotes.Add(1);
+
+        upgrades[5] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 5,
+        };
+        upgrades[5].requiredNotes.Add(2);
+        upgrades[5].requiredNotes.Add(3);
+        upgrades[5].requiredNotes.Add(4);
+
+        upgrades[6] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 6,
+        };
+        upgrades[6].requiredNotes.Add(5);
+
+
+
+        upgrades[7] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 7,
+        };
+
+        upgrades[8] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 8,
+        };
+        upgrades[8].requiredNotes.Add(7);
+
+        upgrades[9] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 9,
+        };
+        upgrades[9].requiredNotes.Add(7);
+
+        upgrades[10] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 10,
+        };
+        upgrades[10].requiredNotes.Add(7);
+
+        upgrades[11] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 11,
+        };
+        upgrades[11].requiredNotes.Add(8);
+        upgrades[11].requiredNotes.Add(9);
+        upgrades[11].requiredNotes.Add(10);
+
+        upgrades[12] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 12,
+        };
+        upgrades[12].requiredNotes.Add(11);
+
+
+
+        upgrades[13] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 13,
+        };
+
+        upgrades[14] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 14,
+        };
+
+        upgrades[15] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 15,
+        };
+        upgrades[15].requiredNotes.Add(13);
+
+        upgrades[16] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 16,
+        };
+        upgrades[16].requiredNotes.Add(13);
+        upgrades[16].requiredNotes.Add(14);
+
+        upgrades[17] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 17,
+        };
+        upgrades[17].requiredNotes.Add(14);
+
+        upgrades[18] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 18,
+        };
+        upgrades[18].requiredNotes.Add(15);
+        upgrades[18].requiredNotes.Add(16);
+        upgrades[18].requiredNotes.Add(17);
+
+        upgrades[19] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 19,
+        };
+        upgrades[19].requiredNotes.Add(18);
+
+
+
+        upgrades[20] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 20,
+        };
+
+        upgrades[21] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 21,
+        };
+
+        upgrades[22] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 22,
+        };
+        upgrades[22].requiredNotes.Add(20);
+
+        upgrades[23] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 23,
+        };
+        upgrades[23].requiredNotes.Add(20);
+        upgrades[23].requiredNotes.Add(21);
+
+        upgrades[24] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 24,
+        };
+        upgrades[24].requiredNotes.Add(21);
+
+        upgrades[25] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 25,
+        };
+        upgrades[25].requiredNotes.Add(22);
+        upgrades[25].requiredNotes.Add(23);
+        upgrades[25].requiredNotes.Add(24);
+
+        upgrades[26] = new upgradeData()
+        {
+            state = upgradeState.selectable,
+            upgradeID = 26,
+        };
+        upgrades[26].requiredNotes.Add(25);
+    }
+
+    public void SetState(int id, upgradeState state)
+    {
+        upgrades.Find(o =&gt; o.upgradeID == id).state = state;
+    }
+
+    public bool AllowedToActivate(int id)
+    {
+        upgradeData data = upgrades[id];
+
+        bool answer = true;
+
+        for (int i = 0; i &lt; data.requiredNotes.Count; i++)
+        {
+            if (upgrades[data.requiredNotes[i]].state == upgradeState.selectable ||
+             upgrades[data.requiredNotes[i]].state == upgradeState.locked)
+            {
+                answer = false;
+                break;
+            }
+        }
+        return answer;
+    }
+
+
+    public void Upgrades(int whichUpgrade)
+    {
+        bool upgrade1;
+        bool upgrade2;
+        bool upgrade3;
+        bool upgrade4;
+
+        if (updatesApplied.Contains(whichUpgrade))
+        {
+            return;
+        }
+
+        updatesApplied.Add(whichUpgrade);
+
+        if (whichUpgrade == 0)
+        {
+            playerHealth.maxHealth += 10;
+        }
+        else if (whichUpgrade == 1)
+        {
+            playerStats.medkitGivingHealth += 10;
+        }
+        else if (whichUpgrade == 2)
+        {
+            playerStats.medkitGivingHealth += 20;
+        }
+        else if (whichUpgrade == 3)
+        {
+            float plusProcentDamage = playerStats.damageDealingPlayer / 100 * 2;
+            playerStats.damageDealingPlayer += plusProcentDamage;
+        }
+        else if (whichUpgrade == 4)
+        {
+            overheating.cooldownTime -= 1;
+        }
+        else if (whichUpgrade == 5)
+        {
+            healingUSB = true;
+        }
+        else if (whichUpgrade == 6)
+        {
+            playerHealth.maxHealth += 50;
+            if (enemyStats.killCountEnemy &gt;= 5)
+            {
+                enemyStats.killCountEnemy = 0;
+                playerHealth.currentHealth += 40;
+            }
+            healingUSBAmount = 50;
+        }
+
+
+        else if (whichUpgrade == 7)
+        {
+            inventory.canBurnEnemyStageOne = true;
+        }
+        else if (whichUpgrade == 8)
+        {
+            overheating.cooldownTime -= 1;
+        }
+        else if (whichUpgrade == 9)
+        {
+            inventory.ammoWeaponMax += 3;
+        }
+        else if (whichUpgrade == 10)
+        {
+            burningDamage.burningDmg += 1;
+        }
+        else if (whichUpgrade == 11)
+        {
+            burningDamage.inBetweenBurningDmgTime = 1;
+            inventory.canBurnEnemyStageOne = false;
+            inventory.canBurnEnemyStageTwo = true;
+        }
+        else if (whichUpgrade == 12)
+        {
+            burningDamage.burningDmg += 6;
+        }
+
+
+        else if (whichUpgrade == 13)
+        {
+            inventory.ammoWeaponMax += 2;
+        }
+        else if (whichUpgrade == 14)
+        {
+            playerHealth.maxShield += 10;
+        }
+        else if (whichUpgrade == 15)
+        {
+            overheating.cooldownTime -= 1;
+        }
+        else if (whichUpgrade == 16)
+        {
+            playerStats.shieldGivingShield += 20;
+        }
+        else if (whichUpgrade == 17)
+        {
+            playerStats.medkitGivingHealth += 20;
+        }
+        else if (whichUpgrade == 18)
+        {
+            playerHealth.maxHealth += 30;
+            playerHealth.maxShield += 30;
+            if (enemyStats.killCountEnemyShieldStageOne &gt;= 15)
+            {
+                enemyStats.killCountEnemyShieldStageOne = 0;
+                playerHealth.currentShield += 55;
+                playerHealth.maxShield += 2;
+            }
+        }
+        else if (whichUpgrade == 19)
+        {
+            float minusProcentDamage = playerStats.damageDealingPlayer / 100 * 10;
+            playerStats.damageDealingPlayer -= minusProcentDamage;
+            float minusProcentBurningDamage = burningDamage.burningDmg / 100 * 10;
+            burningDamage.burningDmg -= minusProcentBurningDamage;
+            playerHealth.maxHealth += 350;
+            playerHealth.maxShield += 250;
+            if (enemyStats.killCountEnemyShieldStageTwo &gt;= 15)
+            {
+                enemyStats.killCountEnemyShieldStageTwo = 0;
+                playerHealth.currentShield += 180;
+                playerHealth.maxShield += 10;
+            }
+        }
+
+
+
+        else if (whichUpgrade == 20)
+        {
+            upgrade1 = true;
+            upgrade2 = false;
+            upgrade3 = false;
+            upgrade4 = false;
+            if (playerStats.healthPercentage &lt;= 20 &amp;&amp; upgrade1 &amp;&amp; 
+            !upgrade2 &amp;&amp; !upgrade3 &amp;&amp; !upgrade4)
+            {
+                playerMovement.currentMoveSpeed *= 1.2f;
+            }
+        }
+        else if (whichUpgrade == 21)
+        {
+            immunity.immunityIsUnlocked = true;
+        }
+        else if (whichUpgrade == 22)
+        {
+            upgrade1 = false;
+            upgrade2 = true;
+            upgrade3 = false;
+            upgrade4 = false;
+            if (playerStats.healthPercentage &lt;= 40 &amp;&amp; !upgrade1 &amp;&amp; 
+            upgrade2 &amp;&amp; !upgrade3 &amp;&amp; !upgrade4)
+            {
+                playerMovement.currentMoveSpeed *= 1.2f;
+            }
+        }
+        else if (whichUpgrade == 23)
+        {
+            float plusProcentSpeed = playerMovement.currentMoveSpeed / 100 * 10;
+            playerMovement.currentMoveSpeed += plusProcentSpeed;
+        }
+        else if (whichUpgrade == 24)
+        {
+            immunity.immunityTime += 0.5f;
+            immunity.cooldownTime -= 5;
+        }
+        else if (whichUpgrade == 25)
+        {
+            upgrade1 = false;
+            upgrade2 = false;
+            upgrade3 = true;
+            upgrade4 = false;
+            if (playerStats.healthPercentage &lt;= 40 &amp;&amp; !upgrade1 &amp;&amp; 
+            !upgrade2 &amp;&amp; upgrade3 &amp;&amp; !upgrade4)
+            {
+                playerMovement.currentMoveSpeed *= 1.6f;
+            }
+            immunity.immunityTime += 1.5f;
+            immunity.cooldownTime -= 5;
+        }
+        else if (whichUpgrade == 26)
+        {
+            upgrade1 = false;
+            upgrade2 = false;
+            upgrade3 = false;
+            upgrade4 = true;
+            if (playerStats.healthPercentage &lt;= 50 &amp;&amp; !upgrade1 &amp;&amp; 
+            !upgrade2 &amp;&amp; !upgrade3 &amp;&amp; upgrade4)
+            {
+                playerMovement.currentMoveSpeed *= 1.8f;
+            }
+            immunity.immunityTime += 2;
+            immunity.cooldownTime -= 5;
+        }
+    }
+}
+                            </code>
+                        </pre>
+                        <div class="text-center">
+                            <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
+                            <a class="btn btn-primary" href="roman_revenant.html">Roman Revenant</a>
+                            <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
+                            <a class="btn btn-primary" href="index.html">Home Page</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="padding-under-custom"></section>  
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+  </body>
+</html>

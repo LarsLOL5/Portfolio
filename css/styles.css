@@ -11281,3 +11281,8 @@ input[type=checkbox]:checked ~ label > img {
   filter: brightness(1);
   border: 10px solid #7ecbab;
 }
+
+.bg-grey {
+  /*background-color: rgba(var(--bs-gray-700), var(--bs-bg-opacity)) !important;*/
+  background-color:#2c3034;
+}
