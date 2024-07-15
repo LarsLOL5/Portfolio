@@ -37,198 +37,199 @@
                         <h3 class="text-white text-center">
                             InRadius System
                         </h3></br>
-                        <h5 class="text-white text-center">
-                            InRadius.cs
-                        </h5>
                         <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_one.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_two.png" alt="..." width="400"/-->
-                        <pre>
-                            <code>
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class InRadius : MonoBehaviour
-{
-    private MedKit medKit;
-    private Shield shield;
-    private KeycardPink keycardPink;
-    private KeycardRed keycardRed;
-    private KeycardGreen keycardGreen;
-    private Gun gun;
-    private UsbStick usbStick;
-    private Inventory inventory;
-    private UpgradesManager upgradesManager;
-    private PlayerHealth playerHealth;
-
-    private void Start()
+                        <button type="button" class="own-collapsible">InRadius.cs</button>
+                        <div class="own-content">
+                            <pre>
+                                <code>
+    
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    
+    public class InRadius : MonoBehaviour
     {
-        medKit = FindObjectOfType&lt;MedKit&gt;();
-        shield = FindObjectOfType&lt;Shield&gt;();
-        keycardPink = FindObjectOfType&lt;KeycardPink&gt;();
-        keycardRed = FindObjectOfType&lt;KeycardRed&gt;();
-        keycardGreen = FindObjectOfType&lt;KeycardGreen&gt;();
-        gun = FindObjectOfType&lt;Gun&gt;();
-        usbStick = FindObjectOfType&lt;UsbStick&gt;();
-        inventory = FindObjectOfType&lt;Inventory&gt;();
-        upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
-        playerHealth = FindObjectOfType&lt;PlayerHealth&gt;();
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.CompareTag(&quot;Medkit&quot;))
+        private MedKit medKit;
+        private Shield shield;
+        private KeycardPink keycardPink;
+        private KeycardRed keycardRed;
+        private KeycardGreen keycardGreen;
+        private Gun gun;
+        private UsbStick usbStick;
+        private Inventory inventory;
+        private UpgradesManager upgradesManager;
+        private PlayerHealth playerHealth;
+    
+        private void Start()
         {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                StartCoroutine(other.GetComponent&lt;MedKit&gt;().Medkit());
-            }
+            medKit = FindObjectOfType&lt;MedKit&gt;();
+            shield = FindObjectOfType&lt;Shield&gt;();
+            keycardPink = FindObjectOfType&lt;KeycardPink&gt;();
+            keycardRed = FindObjectOfType&lt;KeycardRed&gt;();
+            keycardGreen = FindObjectOfType&lt;KeycardGreen&gt;();
+            gun = FindObjectOfType&lt;Gun&gt;();
+            usbStick = FindObjectOfType&lt;UsbStick&gt;();
+            inventory = FindObjectOfType&lt;Inventory&gt;();
+            upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
+            playerHealth = FindObjectOfType&lt;PlayerHealth&gt;();
         }
-
-        if (other.gameObject.CompareTag(&quot;Ammo&quot;))
+        private void OnTriggerStay(Collider other)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (other.gameObject.CompareTag(&quot;Medkit&quot;))
             {
-                StartCoroutine(other.GetComponent&lt;Ammo&gt;().PickUpAmmo());
-            }
-        }
-
-        if (other.gameObject.CompareTag(&quot;Shield&quot;))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                StartCoroutine(other.GetComponent&lt;Shield&gt;().ShieldEquip());
-            }
-        }
-
-        if (other.gameObject.CompareTag(&quot;Gun&quot;))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                StartCoroutine(gun.GunEquip());
-            }
-        }
-
-        if (other.gameObject.CompareTag(&quot;KeycardPink&quot;))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                StartCoroutine(keycardPink.PickUpKeycard());
-            }
-        }
-
-        if (other.gameObject.CompareTag(&quot;KeycardRed&quot;))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                StartCoroutine(keycardRed.PickUpKeycard());
-            }
-        }
-
-        if (other.gameObject.CompareTag(&quot;KeycardGreen&quot;))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                StartCoroutine(keycardGreen.PickUpKeycard());
-            }
-        }
-
-        if (other.gameObject.CompareTag(&quot;USB-Stick&quot;))
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                inventory.USBStickAmount += 1;
-                if (upgradesManager.healingUSB == true)
+                if (Input.GetKeyDown(KeyCode.E))
                 {
-                    playerHealth.currentHealth += upgradesManager.healingUSBAmount; 
+                    StartCoroutine(other.GetComponent&lt;MedKit&gt;().Medkit());
                 }
-                usbStick.OpenUSBScreen();
-
-                Destroy(other.gameObject);
+            }
+    
+            if (other.gameObject.CompareTag(&quot;Ammo&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    StartCoroutine(other.GetComponent&lt;Ammo&gt;().PickUpAmmo());
+                }
+            }
+    
+            if (other.gameObject.CompareTag(&quot;Shield&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    StartCoroutine(other.GetComponent&lt;Shield&gt;().ShieldEquip());
+                }
+            }
+    
+            if (other.gameObject.CompareTag(&quot;Gun&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    StartCoroutine(gun.GunEquip());
+                }
+            }
+    
+            if (other.gameObject.CompareTag(&quot;KeycardPink&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    StartCoroutine(keycardPink.PickUpKeycard());
+                }
+            }
+    
+            if (other.gameObject.CompareTag(&quot;KeycardRed&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    StartCoroutine(keycardRed.PickUpKeycard());
+                }
+            }
+    
+            if (other.gameObject.CompareTag(&quot;KeycardGreen&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    StartCoroutine(keycardGreen.PickUpKeycard());
+                }
+            }
+    
+            if (other.gameObject.CompareTag(&quot;USB-Stick&quot;))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    inventory.USBStickAmount += 1;
+                    if (upgradesManager.healingUSB == true)
+                    {
+                        playerHealth.currentHealth += upgradesManager.healingUSBAmount; 
+                    }
+                    usbStick.OpenUSBScreen();
+    
+                    Destroy(other.gameObject);
+                }
             }
         }
     }
-}
-                            </code>
-                        </pre>
+                                </code>
+                            </pre>
+                        </div>
                         <h3 class="text-white text-center">
                             Upgrade System
                         </h3></br>
-                        <h5 class="text-white text-center">
-                            UpgradeNode.cs
-                        </h5>
                         <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_three.png" alt="..." width="400"/></br></br-->
-                        <pre>
-                            <code>
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-
-public enum upgradeState
-{
-    locked, selectable, alreadyBought
-}
-
-public class UpgradeNode : MonoBehaviour
-{
-    [SerializeField] private UpgradeNode[] nextUpgrades;
-    [SerializeField] private upgradeState state;
-    private UpgradesManager upgradesManager;
-    private Inventory inventory;
-    [SerializeField] private int upgrades;
-
-    private void Awake()
+                        <button type="button" class="own-collapsible">UpgradeNode.cs</button>
+                        <div class="own-content">
+                            <pre>
+                                <code>
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.UI;
+    
+    public enum upgradeState
     {
-        upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
-        inventory = FindObjectOfType&lt;Inventory&gt;();
+        locked, selectable, alreadyBought
     }
-
-    public void OnClickEnter()
+    
+    public class UpgradeNode : MonoBehaviour
     {
-        if (inventory.USBStickAmount &lt;= 0)
+        [SerializeField] private UpgradeNode[] nextUpgrades;
+        [SerializeField] private upgradeState state;
+        private UpgradesManager upgradesManager;
+        private Inventory inventory;
+        [SerializeField] private int upgrades;
+    
+        private void Awake()
         {
-            return;
+            upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
+            inventory = FindObjectOfType&lt;Inventory&gt;();
         }
-
-        upgradesManager.SetState(upgrades, upgradeState.alreadyBought);
-        
-        foreach (UpgradeNode node in nextUpgrades)
+    
+        public void OnClickEnter()
         {
-            if (upgradesManager.AllowedToActivate(node.upgrades))
+            if (inventory.USBStickAmount &lt;= 0)
             {
-                node.GetComponent&lt;Button&gt;().interactable = true;
+                return;
             }
+    
+            upgradesManager.SetState(upgrades, upgradeState.alreadyBought);
+            
+            foreach (UpgradeNode node in nextUpgrades)
+            {
+                if (upgradesManager.AllowedToActivate(node.upgrades))
+                {
+                    node.GetComponent&lt;Button&gt;().interactable = true;
+                }
+            }
+            upgradesManager.Upgrades(upgrades);
         }
-        upgradesManager.Upgrades(upgrades);
-    }
-
-    public void SetStateToBought()
-    {
-        if (inventory.USBStickAmount &lt;= 0)
+    
+        public void SetStateToBought()
         {
-            return;
+            if (inventory.USBStickAmount &lt;= 0)
+            {
+                return;
+            }
+            inventory.USBStickAmount -= 1;
+            Button b = GetComponent&lt;Button&gt;();
+            ColorBlock cb = b.colors;
+    
+            cb.disabledColor = Color.green;
+            b.colors = cb;
+    
+            b.interactable = false;
         }
-        inventory.USBStickAmount -= 1;
-        Button b = GetComponent&lt;Button&gt;();
-        ColorBlock cb = b.colors;
-
-        cb.disabledColor = Color.green;
-        b.colors = cb;
-
-        b.interactable = false;
     }
-}
-                            </code>
-                        </pre>
-                        <h5 class="text-white text-center">
-                            UpgradesManager.cs
-                        </h5>
+                                </code>
+                            </pre>
+                        </div>
+                        <div class="padding-custom-2"></div>
                         <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_one.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_two.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_three.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_four.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_five.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_six.png" alt="..." width="400"/></br></br-->
+                        <button type="button" class="own-collapsible">UpgradesManager.cs</button>
+                        <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
@@ -678,17 +679,35 @@ public class UpgradesManager : MonoBehaviour
 }
                             </code>
                         </pre>
+                        </div>
                         <div class="text-center">
                             <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
                             <a class="btn btn-primary" href="roman_revenant.html">Roman Revenant</a>
                             <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
-                            <a class="btn btn-primary" href="index.html">Home Page</a>
+                            <a class="btn btn-primary" href="index.html#projects">Home Page</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         <section class="padding-under-custom"></section>  
+        <script>
+var coll = document.getElementsByClassName("own-collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("own-active");
+    var content = this.nextElementSibling;
+
+    if (!content.style.display || content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+            </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script> 
   </body>

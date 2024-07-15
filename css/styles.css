@@ -275,7 +275,7 @@ samp {
 pre {
   display: block;
   margin-top: 0;
-  margin-bottom: 1rem;
+  /*margin-bottom: 1rem;*/
   overflow: auto;
   font-size: 0.875em;
 }
@@ -11251,6 +11251,54 @@ body {
   padding: 10rem;
 }
 
+.padding-custom-025{
+  padding: 0.25rem;
+}
+
+.padding-custom-05{
+  padding: 0.5rem;
+}
+
+.padding-custom-075{
+  padding: 0.75rem;
+}
+
+.padding-custom-1{
+  padding: 1rem;
+}
+
+.padding-custom-2{
+  padding: 2rem;
+}
+
+.padding-custom-3{
+  padding: 3rem;
+}
+
+.padding-custom-4{
+  padding: 4rem;
+}
+
+.padding-custom-5{
+  padding: 5rem;
+}
+
+.padding-custom-6{
+  padding: 6rem;
+}
+
+.padding-custom-7{
+  padding: 7rem;
+}
+
+.padding-custom-8{
+  padding: 8rem;
+}
+
+.padding-custom-9{
+  padding: 9rem;
+}
+
 .container-custom {
   display: flex;
   align-items: center;
@@ -11279,10 +11327,50 @@ input[type=checkbox]:checked ~ label > img {
   transform: scale(2);
   cursor: zoom-out;
   filter: brightness(1);
-  border: 10px solid #7ecbab;
+  border: 10px solid rgba(0,139,139,0.9);
 }
 
 .bg-grey {
   /*background-color: rgba(var(--bs-gray-700), var(--bs-bg-opacity)) !important;*/
   background-color:#2c3034;
+}
+
+.own-collapsible {
+  background-color: rgba(0,139,139,0.8);
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 30%;
+  position: relative;
+  left: 35%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 22px;
+}
+
+.own-active,
+.own-collapsible:hover {
+  background-color: rgba(0,139,139,0.5);
+}
+
+.own-content {
+  padding: 0 18px;
+  display: block;
+  /*overflow: hidden;*/
+  background-color: rgba(0, 0, 0, 0.045);
+}
+
+
+
+.own-collapsible:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 20px;
+  color: white;
+  float: right;
+  margin-left: 5px;
+}
+
+.own-active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
 }

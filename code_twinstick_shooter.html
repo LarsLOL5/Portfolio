@@ -36,12 +36,12 @@
                     <div class="col-lg-8">
                         <h3 class="text-white text-center">
                             InRadius System
-                        </h3></br>
-                        <h5 class="text-white text-center">
-                            InRadius.cs
-                        </h5>
+                        </h3>
+                        <div class="padding-custom-075"></div>
                         <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_one.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_two.png" alt="..." width="400"/-->
+                        <button type="button" class="own-collapsible">InRadius.cs</button>
+                        <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
@@ -150,13 +150,15 @@ public class InRadius : MonoBehaviour
 }
                             </code>
                         </pre>
+                        </div>
+                        <div class="padding-custom-1"></div>
                         <h3 class="text-white text-center">
                             Upgrade System
-                        </h3></br>
-                        <h5 class="text-white text-center">
-                            UpgradeNode.cs
-                        </h5>
+                        </h3>
+                        <div class="padding-custom-075"></div>
                         <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_three.png" alt="..." width="400"/></br></br-->
+                        <button type="button" class="own-collapsible">UpgradeNode.cs</button>
+                        <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
@@ -220,15 +222,16 @@ public class UpgradeNode : MonoBehaviour
 }
                             </code>
                         </pre>
-                        <h5 class="text-white text-center">
-                            UpgradesManager.cs
-                        </h5>
+                        </div>
                         <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_one.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_two.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_three.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_four.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_five.png" alt="..." width="400"/></br></br>
                         <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_six.png" alt="..." width="400"/></br></br-->
+                        <div class="padding-custom-1"></div>
+                        <button type="button" class="own-collapsible">UpgradesManager.cs</button>
+                        <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
@@ -678,17 +681,35 @@ public class UpgradesManager : MonoBehaviour
 }
                             </code>
                         </pre>
+                        </div>
                         <div class="text-center">
                             <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
                             <a class="btn btn-primary" href="twinstick_shooter.html">Twinstick Shooter</a>
                             <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
-                            <a class="btn btn-primary" href="index.html">Home Page</a>
+                            <a class="btn btn-primary" href="index.html#projects">Home Page</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="padding-under-custom"></section>  
+        <section class="padding-under-custom"></section>
+        <script>
+            var coll = document.getElementsByClassName("own-collapsible");
+            var i;
+            
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("own-active");
+                var content = this.nextElementSibling;
+            
+                if (!content.style.display || content.style.display === "block") {
+                  content.style.display = "none";
+                } else {
+                  content.style.display = "block";
+                }
+              });
+            }
+        </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script> 
   </body>

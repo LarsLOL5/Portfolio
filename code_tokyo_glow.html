@@ -34,10 +34,9 @@
             <div class="container px-8 px-lg-10">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8">
-                        <h5 class="text-white text-center">
-                            PlayerCarInput.cs
-                        </h5>
                         <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_one.png" alt="..." width="250"/></br></br></br-->
+                        <button type="button" class="own-collapsible">PlayerCarInput.cs</button>
+                        <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
@@ -136,10 +135,11 @@ public class PlayerCarInput : MonoBehaviour
 }
                             </code>
                         </pre>
-                        <h5 class="text-white text-center">
-                            Wheel.cs
-                        </h5>
+                        </div>
+                        <div class="padding-custom-2"></div>
                         <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_two.png" alt="..." width="500"/-->
+                        <button type="button" class="own-collapsible">Wheel.cs</button>
+                        <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
@@ -192,17 +192,35 @@ public class Wheel : MonoBehaviour
 }
                             </code>
                         </pre>
+                        </div>
                         <div class="text-center">
                             <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
                             <a class="btn btn-primary" href="tokyo_glow.html">Tokyo Glow</a>
                             <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
-                            <a class="btn btn-primary" href="index.html">Home Page</a>
+                            <a class="btn btn-primary" href="index.html#projects">Home Page</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="padding-under-custom"></section>   
+        <section class="padding-under-custom"></section>
+        <script>
+            var coll = document.getElementsByClassName("own-collapsible");
+            var i;
+            
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("own-active");
+                var content = this.nextElementSibling;
+            
+                if (!content.style.display || content.style.display === "block") {
+                  content.style.display = "none";
+                } else {
+                  content.style.display = "block";
+                }
+              });
+            }
+        </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script>
   </body>
