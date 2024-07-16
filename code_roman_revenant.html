@@ -35,200 +35,317 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8">
                         <h3 class="text-white text-center">
-                            InRadius System
+                            Enemies
                         </h3></br>
-                        <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_one.png" alt="..." width="400"/></br></br>
-                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_two.png" alt="..." width="400"/-->
-                        <button type="button" class="own-collapsible">InRadius.cs</button>
+
+                        <button type="button" class="own-collapsible">StateMachine.cs</button>
                         <div class="own-content">
                             <pre>
                                 <code>
-    
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
-    
-    public class InRadius : MonoBehaviour
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using UnityEngine;
+public enum States
+{
+    chasePlayer,
+    chaseNewPos,
+    attack,
+    abilityUse
+}
+public class StateMachine : MonoBehaviour
+{
+    [SerializeField] States currentState;
+    private States defaultState;
+
+    private float randomTime;
+    private float newPosTimer;
+    [SerializeField] float abilityTimer;
+
+    private bool newPosAlreadyCalledOnce;
+    private bool attackAlreadyCalledOnce;
+    private bool abilityUseAlreadyCalledOnce;
+
+    [HideInInspector] public GameObject playerTransform;
+
+    private Vector3 newPos;
+    private float distanceToNewPos;
+
+    private EnemyNewPosGeneration enemyNewPosGen;
+    private Enemy enemy;
+    private EnemyAbility enemyAbility;
+    private EnemyMainAttack enemyMainAttack;
+    private void Start()
     {
-        private MedKit medKit;
-        private Shield shield;
-        private KeycardPink keycardPink;
-        private KeycardRed keycardRed;
-        private KeycardGreen keycardGreen;
-        private Gun gun;
-        private UsbStick usbStick;
-        private Inventory inventory;
-        private UpgradesManager upgradesManager;
-        private PlayerHealth playerHealth;
-    
-        private void Start()
+        defaultState = States.chasePlayer;
+        currentState = defaultState;
+        randomTime = UnityEngine.Random.Range(1, 10);
+
+        enemyNewPosGen = GetComponent&lt;EnemyNewPosGeneration&gt;();
+        enemy = GetComponent&lt;Enemy&gt;();
+        enemyAbility = GetComponent&lt;EnemyAbility&gt;();
+        enemyMainAttack = GetComponent&lt;EnemyMainAttack&gt;();
+    }
+
+    private void Update()
+    {
+        if (enemy == null)
         {
-            medKit = FindObjectOfType&lt;MedKit&gt;();
-            shield = FindObjectOfType&lt;Shield&gt;();
-            keycardPink = FindObjectOfType&lt;KeycardPink&gt;();
-            keycardRed = FindObjectOfType&lt;KeycardRed&gt;();
-            keycardGreen = FindObjectOfType&lt;KeycardGreen&gt;();
-            gun = FindObjectOfType&lt;Gun&gt;();
-            usbStick = FindObjectOfType&lt;UsbStick&gt;();
-            inventory = FindObjectOfType&lt;Inventory&gt;();
-            upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
-            playerHealth = FindObjectOfType&lt;PlayerHealth&gt;();
+            return;
         }
-        private void OnTriggerStay(Collider other)
+        if (playerTransform == null)
         {
-            if (other.gameObject.CompareTag(&quot;Medkit&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(other.GetComponent&lt;MedKit&gt;().Medkit());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;Ammo&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(other.GetComponent&lt;Ammo&gt;().PickUpAmmo());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;Shield&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(other.GetComponent&lt;Shield&gt;().ShieldEquip());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;Gun&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(gun.GunEquip());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;KeycardPink&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(keycardPink.PickUpKeycard());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;KeycardRed&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(keycardRed.PickUpKeycard());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;KeycardGreen&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    StartCoroutine(keycardGreen.PickUpKeycard());
-                }
-            }
-    
-            if (other.gameObject.CompareTag(&quot;USB-Stick&quot;))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    inventory.USBStickAmount += 1;
-                    if (upgradesManager.healingUSB == true)
-                    {
-                        playerHealth.currentHealth += upgradesManager.healingUSBAmount; 
-                    }
-                    usbStick.OpenUSBScreen();
-    
-                    Destroy(other.gameObject);
-                }
-            }
+            playerTransform = GameObject.FindWithTag(&quot;Player&quot;);
+        }
+        StateInfo();
+        TriggerChaseNewPos();
+        TriggerAbilityUse();
+        TriggerAttack();
+    }
+
+    public void TriggerChaseNewPos()
+    {
+        newPosTimer += Time.deltaTime;
+        distanceToNewPos = Vector3.Distance(newPos, enemyNewPosGen.transform.position);
+        if (newPosTimer &gt;= randomTime)
+        {
+            WantsToBeNextState(States.chaseNewPos);
+        }
+
+        if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
+        {
+            ResetTimers();
+            GoToDefaultState();
         }
     }
-                                </code>
-                            </pre>
-                        </div>
-                        <h3 class="text-white text-center">
-                            Upgrade System
-                        </h3></br>
-                        <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_part_three.png" alt="..." width="400"/></br></br-->
-                        <button type="button" class="own-collapsible">UpgradeNode.cs</button>
-                        <div class="own-content">
-                            <pre>
-                                <code>
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using UnityEngine.UI;
-    
-    public enum upgradeState
+
+    public void TriggerAttack()
     {
-        locked, selectable, alreadyBought
-    }
-    
-    public class UpgradeNode : MonoBehaviour
-    {
-        [SerializeField] private UpgradeNode[] nextUpgrades;
-        [SerializeField] private upgradeState state;
-        private UpgradesManager upgradesManager;
-        private Inventory inventory;
-        [SerializeField] private int upgrades;
-    
-        private void Awake()
+        float distance = Vector3.Distance(playerTransform.transform.position, transform.position);
+        if (distance &lt; enemy.attackRange)
         {
-            upgradesManager = FindObjectOfType&lt;UpgradesManager&gt;();
-            inventory = FindObjectOfType&lt;Inventory&gt;();
+            WantsToBeNextState(States.attack);
         }
-    
-        public void OnClickEnter()
+        else if (currentState == States.attack)
         {
-            if (inventory.USBStickAmount &lt;= 0)
+            currentState = defaultState;
+        }
+    }
+
+    private void TriggerAbilityUse()
+    {
+        abilityTimer += Time.deltaTime;
+        if (abilityTimer &gt;= enemy.abilityCooldown)
+        {
+            WantsToBeNextState(States.abilityUse);
+        }
+
+        if (currentState == States.abilityUse &amp;&amp; enemyAbility.EndAbility)
+        {
+            ResetTimers();
+            GoToDefaultState();
+            enemyAbility.EndAbility = false;
+        }
+    }
+
+
+    private void WantsToBeNextState(States possableNewState)
+    {
+        if (currentState &lt; possableNewState)
+        {
+            GoToNextState(possableNewState);
+        }
+    }
+
+    private void GoToNextState(States newState)
+    {
+        currentState = newState;
+    }
+    private void StateInfo()
+    {
+        if (currentState == States.chasePlayer)
+        {
+            enemy.enemyAgent.destination = playerTransform.transform.position;
+        }
+        if (currentState == States.chaseNewPos &amp;&amp; !newPosAlreadyCalledOnce)
+        {
+            newPosAlreadyCalledOnce = true;
+            newPos = enemyNewPosGen.CreateNewPos();
+            enemy.enemyAgent.destination = newPos;
+        }
+        if (currentState == States.attack &amp;&amp; !attackAlreadyCalledOnce)
+        {
+            attackAlreadyCalledOnce = true;
+            enemy.enemyAgent.speed = 0f;
+            enemyMainAttack.CheckForDesync();
+        }
+        if (currentState != States.attack &amp;&amp; currentState != States.abilityUse &amp;&amp; !enemy.isDead)
+        {
+            enemy.canAttackPlayer = false;
+            enemy.enemyAgent.speed = enemy.enemySpeed;
+        }
+        if (currentState == States.abilityUse &amp;&amp; !abilityUseAlreadyCalledOnce)
+        {
+            abilityUseAlreadyCalledOnce = true;
+            if (enemy.data.Ability == EnemyAbilities.none)
             {
+                GoToDefaultState();
+                ResetTimers();
                 return;
             }
-    
-            upgradesManager.SetState(upgrades, upgradeState.alreadyBought);
-            
-            foreach (UpgradeNode node in nextUpgrades)
-            {
-                if (upgradesManager.AllowedToActivate(node.upgrades))
-                {
-                    node.GetComponent&lt;Button&gt;().interactable = true;
-                }
-            }
-            upgradesManager.Upgrades(upgrades);
-        }
-    
-        public void SetStateToBought()
-        {
-            if (inventory.USBStickAmount &lt;= 0)
-            {
-                return;
-            }
-            inventory.USBStickAmount -= 1;
-            Button b = GetComponent&lt;Button&gt;();
-            ColorBlock cb = b.colors;
-    
-            cb.disabledColor = Color.green;
-            b.colors = cb;
-    
-            b.interactable = false;
+            enemy.enemyAgent.speed = 0;
+            StartCoroutine(enemyAbility.DoAbilityAnimation());
         }
     }
+
+    public void GoToDefaultState()
+    {
+        currentState = defaultState;
+        newPosAlreadyCalledOnce = false;
+        attackAlreadyCalledOnce = false;
+        abilityUseAlreadyCalledOnce = false;
+    }
+    public void ResetTimers()
+    {
+        newPosTimer = 0;
+        randomTime = UnityEngine.Random.Range(1, 10);
+        abilityTimer = 0;
+    }
+}
                                 </code>
                             </pre>
                         </div>
                         <div class="padding-custom-2"></div>
-                        <!--img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_one.png" alt="..." width="400"/></br></br>
-                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_two.png" alt="..." width="400"/></br></br>
-                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_three.png" alt="..." width="400"/></br></br>
-                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_four.png" alt="..." width="400"/></br></br>
-                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_five.png" alt="..." width="400"/></br></br>
-                        <img class="img-fluid" src="assets/img/Code_Twinstick_Shooter_UpgradesManager_part_six.png" alt="..." width="400"/></br></br-->
-                        <button type="button" class="own-collapsible">UpgradesManager.cs</button>
+                        <button type="button" class="own-collapsible">Enemy.cs</button>
+                        <div class="own-content">
+                            <pre>
+                                <code>
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.AI;
+
+public class Enemy : MonoBehaviour
+{
+    public EnemyData data;
+
+    public AnimationClip dieAnimation;
+
+    [HideInInspector] public string nameOfEnemy;
+    [HideInInspector] public float damageAmount;
+    [HideInInspector] public float enemySpeed;
+    [HideInInspector] public float timeBetweenAttacks;
+    [HideInInspector] public float timeTillHit;
+    [HideInInspector] public float accuracyEnemy;
+    [HideInInspector] public float attackRange;
+
+    [HideInInspector] public float passiveCritChance;
+
+    [HideInInspector] public float abilityCooldown;
+
+    [HideInInspector] public float selfHealAmount;
+
+    [HideInInspector] public float aoeAbilityHealAmount;
+    [HideInInspector] public float aoeAbilityHealRange;
+
+    [HideInInspector] public float enemyBuffChance;
+
+    [HideInInspector] public NavMeshAgent enemyAgent;
+
+    [HideInInspector] public bool canAttackPlayer;
+    [HideInInspector] public bool onAttackCooldown;
+
+    [HideInInspector] public bool isDead;
+
+    [HideInInspector] public bool isInRange;
+
+    [HideInInspector] public Animator animator;
+
+    [SerializeField] private ParticleSystem bloodParticle;
+
+    [HideInInspector] public float enemyMaxHealth;
+
+    private AudioSource deathnoise;
+    private bool playOnce;
+
+    public float enemyHealth;
+    private void Awake()
+    {
+        nameOfEnemy = data.EnemyName;
+        enemyMaxHealth = data.MaxHealth;
+        enemyHealth = enemyMaxHealth;
+        damageAmount = data.Damage;
+        enemySpeed = data.Speed;
+        timeBetweenAttacks = data.AttackFrequency;
+        timeTillHit = data.TimeTillAnimationHit;
+        accuracyEnemy = data.Accuracy;
+        attackRange = data.Range;
+
+        passiveCritChance = data.CritChance;
+
+        abilityCooldown = data.Cooldown;
+
+        selfHealAmount = data.HealAmount;
+        aoeAbilityHealAmount = data.AoeHealAmount;
+        aoeAbilityHealRange = data.AoeHealRange;
+
+        enemyBuffChance = data.BuffChance;
+
+        animator = GetComponent&lt;Animator&gt;();
+        enemyAgent = GetComponent&lt;NavMeshAgent&gt;();
+    }
+
+    public void Heal(float heal)
+    {
+        enemyHealth += heal;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        bloodParticle.Play();
+        enemyHealth -= damage;
+        SoundSystem.Instance.SwingHit();
+        if (enemyHealth &lt;= 0)
+        {
+            
+            StartCoroutine(DieAnimation());
+        }
+    }
+
+    private IEnumerator DieAnimation()
+    {
+        isDead = true;
+        if (!playOnce) 
+        {
+            deathnoise = GetComponent&lt;AudioSource&gt;();
+            deathnoise.Play();
+            playOnce = true;
+        }
+        animator.SetInteger(&quot;Death&quot;, Random.Range(1, 2));
+        damageAmount = 0;
+        enemyAgent.speed = 0;
+        GetComponent&lt;EnemyBuff&gt;().buffedEnemyCanvas.SetActive(false);
+        yield return new WaitForSeconds(dieAnimation.length);
+        Die();
+    }
+    private void Die()
+    {
+        var playerScoreAndMoney = FloatValueManager.Instance;
+        playerScoreAndMoney.CurrentScore += data.ScoreGiven;
+        playerScoreAndMoney.CurrentGold += data.GoldGiven;
+
+        Destroy(gameObject);
+    }
+}
+
+                                </code>
+                            </pre>
+                        </div>
+                        <div class="padding-custom-2"></div>
+                        <button type="button" class="own-collapsible">EnemyMainAttack.cs</button>
                         <div class="own-content">
                         <pre>
                             <code>
@@ -236,445 +353,150 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UpgradesManager : MonoBehaviour
+public enum MainAttacks
 {
-    public class upgradeData
-    {
-        public upgradeState state;
-        public int upgradeID;
-        public List&lt;int&gt; requiredNotes = new List&lt;int&gt;();
-        public string type = &quot;regular&quot;;
-    }
+    stab,
+    slash,
+    shoot,
+    snipe
+}
 
-    private PlayerHealth playerHealth;
-    private PlayerStats playerStats;
-    private EnemyStats enemyStats;
-    private Inventory inventory;
-    private PlayerMovement playerMovement;
-    private BurningDamage burningDamage;
-    private Overheating overheating;
-    private Immunity immunity;
+public enum Sniper
+{
+    scope,
+    fire
+}
+public class EnemyMainAttack : MonoBehaviour
+{
+    [SerializeField] GameObject hitRange;
+    [SerializeField] GameObject fireball;
 
-    private List&lt;upgradeData&gt; upgrades;
-    public bool healingUSB;
-    public int healingUSBAmount = 25;
+    [SerializeField] Collider enemyHitRange;
 
-    [SerializeField] private List&lt;int&gt; updatesApplied = new List&lt;int&gt;();
+    private Enemy enemy;
+    private StateMachine stateMachine;
+    private LazerForSniper lazerForSniper;
 
+    private Sniper sniper;
 
+    private bool isOnAttackCooldown;
+
+    private GameObject currentHitRange;
+    private GameObject currentFireball;
+
+    private HitRangeCollider hitRangeCollider;
+
+    private float angle;
+
+    public bool canTurnToPlayer;
+    public bool canTurnToPredict;
     private void Awake()
     {
-        playerHealth = FindObjectOfType&lt;PlayerHealth&gt;();
-        playerStats = FindObjectOfType&lt;PlayerStats&gt;();
-        enemyStats = FindObjectOfType&lt;EnemyStats&gt;();
-        inventory = FindObjectOfType&lt;Inventory&gt;();
-        playerMovement = FindObjectOfType&lt;PlayerMovement&gt;();
-        burningDamage = FindObjectOfType&lt;BurningDamage&gt;();
-        overheating = FindObjectOfType&lt;Overheating&gt;();
-        immunity = FindObjectOfType&lt;Immunity&gt;();
+        enemy = GetComponent&lt;Enemy&gt;();
+        stateMachine = GetComponent&lt;StateMachine&gt;();
+        lazerForSniper = GetComponentInChildren&lt;LazerForSniper&gt;();
 
-        upgrades = new List&lt;upgradeData&gt;();
-        for (int i = 0; i &lt; 27; i++)
-        {
-            upgradeData node = new upgradeData()
-            {
-                state = upgradeState.selectable,
-                upgradeID = i
-            };
-            upgrades.Add(node);
-        }
-
-        upgrades[2].requiredNotes.Add(0);
-
-        upgrades[3].requiredNotes.Add(0);
-        upgrades[3].requiredNotes.Add(1);
-
-        upgrades[4].requiredNotes.Add(1);
-
-        upgrades[5] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 5,
-        };
-        upgrades[5].requiredNotes.Add(2);
-        upgrades[5].requiredNotes.Add(3);
-        upgrades[5].requiredNotes.Add(4);
-
-        upgrades[6] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 6,
-        };
-        upgrades[6].requiredNotes.Add(5);
-
-
-
-        upgrades[7] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 7,
-        };
-
-        upgrades[8] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 8,
-        };
-        upgrades[8].requiredNotes.Add(7);
-
-        upgrades[9] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 9,
-        };
-        upgrades[9].requiredNotes.Add(7);
-
-        upgrades[10] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 10,
-        };
-        upgrades[10].requiredNotes.Add(7);
-
-        upgrades[11] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 11,
-        };
-        upgrades[11].requiredNotes.Add(8);
-        upgrades[11].requiredNotes.Add(9);
-        upgrades[11].requiredNotes.Add(10);
-
-        upgrades[12] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 12,
-        };
-        upgrades[12].requiredNotes.Add(11);
-
-
-
-        upgrades[13] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 13,
-        };
-
-        upgrades[14] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 14,
-        };
-
-        upgrades[15] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 15,
-        };
-        upgrades[15].requiredNotes.Add(13);
-
-        upgrades[16] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 16,
-        };
-        upgrades[16].requiredNotes.Add(13);
-        upgrades[16].requiredNotes.Add(14);
-
-        upgrades[17] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 17,
-        };
-        upgrades[17].requiredNotes.Add(14);
-
-        upgrades[18] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 18,
-        };
-        upgrades[18].requiredNotes.Add(15);
-        upgrades[18].requiredNotes.Add(16);
-        upgrades[18].requiredNotes.Add(17);
-
-        upgrades[19] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 19,
-        };
-        upgrades[19].requiredNotes.Add(18);
-
-
-
-        upgrades[20] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 20,
-        };
-
-        upgrades[21] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 21,
-        };
-
-        upgrades[22] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 22,
-        };
-        upgrades[22].requiredNotes.Add(20);
-
-        upgrades[23] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 23,
-        };
-        upgrades[23].requiredNotes.Add(20);
-        upgrades[23].requiredNotes.Add(21);
-
-        upgrades[24] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 24,
-        };
-        upgrades[24].requiredNotes.Add(21);
-
-        upgrades[25] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 25,
-        };
-        upgrades[25].requiredNotes.Add(22);
-        upgrades[25].requiredNotes.Add(23);
-        upgrades[25].requiredNotes.Add(24);
-
-        upgrades[26] = new upgradeData()
-        {
-            state = upgradeState.selectable,
-            upgradeID = 26,
-        };
-        upgrades[26].requiredNotes.Add(25);
+        hitRangeCollider = GetComponentInChildren&lt;HitRangeCollider&gt;();
     }
 
-    public void SetState(int id, upgradeState state)
+    private void Update()
     {
-        upgrades.Find(o =&gt; o.upgradeID == id).state = state;
+        if (currentFireball != null)
+        {
+            currentFireball.transform.position -= new Vector3(0, 8 * Time.deltaTime, 0);
+        }
+        if (angle &gt; 1f &amp;&amp; sniper == Sniper.scope &amp;&amp; canTurnToPlayer)
+        {
+            // Rotate towards the player
+            Vector3 direction = (stateMachine.playerTransform.transform.position - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(direction, Vector3.up);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
+        }
+        if (angle &gt; 1f &amp;&amp; sniper == Sniper.scope &amp;&amp; canTurnToPredict)
+        {
+            // Rotate towards the player
+            Vector3 direction = (lazerForSniper.predictPlayerPosition - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(direction, Vector3.up);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
+        }
+    }
+    public void CheckForDesync()
+    {
+        float number = Random.Range(1, 100);
+        if (number &lt; enemy.accuracyEnemy &amp;&amp; !isOnAttackCooldown)
+        {
+            enemy.animator.SetBool(&quot;Attack&quot;, true);
+            StartCoroutine(AttackCooldown());
+            StartCoroutine(DesyncAttackAnimation());
+        }
+        else if (!isOnAttackCooldown)
+        {
+            enemy.animator.SetBool(&quot;AttackMiss&quot;, true);
+        }
     }
 
-    public bool AllowedToActivate(int id)
+    private IEnumerator DesyncAttackAnimation()
     {
-        upgradeData data = upgrades[id];
-
-        bool answer = true;
-
-        for (int i = 0; i &lt; data.requiredNotes.Count; i++)
+        if (enemy.data.MainAttack == MainAttacks.shoot)
         {
-            if (upgrades[data.requiredNotes[i]].state == upgradeState.selectable ||
-             upgrades[data.requiredNotes[i]].state == upgradeState.locked)
-            {
-                answer = false;
-                break;
-            }
+            currentHitRange = Instantiate(hitRange, stateMachine.playerTransform.transform.position,
+                stateMachine.playerTransform.transform.rotation);
+            yield return new WaitForSeconds(enemy.timeTillHit);
+
+            currentFireball = Instantiate(fireball, currentHitRange.transform.position +
+                new Vector3(Random.Range(-2.5f, 2.5f), 10, Random.Range(-2.5f, 2.5f)), transform.rotation);
+            Destroy(currentHitRange);
+            yield return new WaitForSeconds(1.5f);
+
+            Destroy(currentFireball);
         }
-        return answer;
+        if (enemy.data.MainAttack == MainAttacks.snipe)
+        {
+            canTurnToPlayer = true;
+            angle = Vector3.Angle(transform.forward, stateMachine.playerTransform.transform.position - transform.position);
+            StartCoroutine(GetComponentInChildren&lt;LazerForSniper&gt;().GetAndSetAllPositions());
+        }
+        else
+        {
+            yield return new WaitForSeconds(enemy.timeTillHit);
+            InColliderRange();
+        }
     }
 
-
-    public void Upgrades(int whichUpgrade)
+    private void InColliderRange()
     {
-        bool upgrade1;
-        bool upgrade2;
-        bool upgrade3;
-        bool upgrade4;
-
-        if (updatesApplied.Contains(whichUpgrade))
+        if (enemyHitRange.bounds.Contains(stateMachine.playerTransform.transform.position) &amp;&amp; 
+            enemy.data.Passives == Passives.crit)
         {
-            return;
-        }
-
-        updatesApplied.Add(whichUpgrade);
-
-        if (whichUpgrade == 0)
-        {
-            playerHealth.maxHealth += 10;
-        }
-        else if (whichUpgrade == 1)
-        {
-            playerStats.medkitGivingHealth += 10;
-        }
-        else if (whichUpgrade == 2)
-        {
-            playerStats.medkitGivingHealth += 20;
-        }
-        else if (whichUpgrade == 3)
-        {
-            float plusProcentDamage = playerStats.damageDealingPlayer / 100 * 2;
-            playerStats.damageDealingPlayer += plusProcentDamage;
-        }
-        else if (whichUpgrade == 4)
-        {
-            overheating.cooldownTime -= 1;
-        }
-        else if (whichUpgrade == 5)
-        {
-            healingUSB = true;
-        }
-        else if (whichUpgrade == 6)
-        {
-            playerHealth.maxHealth += 50;
-            if (enemyStats.killCountEnemy &gt;= 5)
+            float number = Random.Range(1, 100);
+            if (number &lt; enemy.passiveCritChance)
             {
-                enemyStats.killCountEnemy = 0;
-                playerHealth.currentHealth += 40;
+                PlayerHealth player = hitRangeCollider.otherCollider.GetComponent&lt;PlayerHealth&gt;();
+                player.TakeDamage(enemy.damageAmount * Random.Range(2.8f, 3.1f));
             }
-            healingUSBAmount = 50;
-        }
-
-
-        else if (whichUpgrade == 7)
-        {
-            inventory.canBurnEnemyStageOne = true;
-        }
-        else if (whichUpgrade == 8)
-        {
-            overheating.cooldownTime -= 1;
-        }
-        else if (whichUpgrade == 9)
-        {
-            inventory.ammoWeaponMax += 3;
-        }
-        else if (whichUpgrade == 10)
-        {
-            burningDamage.burningDmg += 1;
-        }
-        else if (whichUpgrade == 11)
-        {
-            burningDamage.inBetweenBurningDmgTime = 1;
-            inventory.canBurnEnemyStageOne = false;
-            inventory.canBurnEnemyStageTwo = true;
-        }
-        else if (whichUpgrade == 12)
-        {
-            burningDamage.burningDmg += 6;
-        }
-
-
-        else if (whichUpgrade == 13)
-        {
-            inventory.ammoWeaponMax += 2;
-        }
-        else if (whichUpgrade == 14)
-        {
-            playerHealth.maxShield += 10;
-        }
-        else if (whichUpgrade == 15)
-        {
-            overheating.cooldownTime -= 1;
-        }
-        else if (whichUpgrade == 16)
-        {
-            playerStats.shieldGivingShield += 20;
-        }
-        else if (whichUpgrade == 17)
-        {
-            playerStats.medkitGivingHealth += 20;
-        }
-        else if (whichUpgrade == 18)
-        {
-            playerHealth.maxHealth += 30;
-            playerHealth.maxShield += 30;
-            if (enemyStats.killCountEnemyShieldStageOne &gt;= 15)
+            else
             {
-                enemyStats.killCountEnemyShieldStageOne = 0;
-                playerHealth.currentShield += 55;
-                playerHealth.maxShield += 2;
+                PlayerHealth player = hitRangeCollider.otherCollider.GetComponent&lt;PlayerHealth&gt;();
+                player.TakeDamage(enemy.damageAmount);
             }
         }
-        else if (whichUpgrade == 19)
+        if (enemyHitRange.bounds.Contains(stateMachine.playerTransform.transform.position) &amp;&amp;
+            enemy.data.Passives != Passives.crit)
         {
-            float minusProcentDamage = playerStats.damageDealingPlayer / 100 * 10;
-            playerStats.damageDealingPlayer -= minusProcentDamage;
-            float minusProcentBurningDamage = burningDamage.burningDmg / 100 * 10;
-            burningDamage.burningDmg -= minusProcentBurningDamage;
-            playerHealth.maxHealth += 350;
-            playerHealth.maxShield += 250;
-            if (enemyStats.killCountEnemyShieldStageTwo &gt;= 15)
-            {
-                enemyStats.killCountEnemyShieldStageTwo = 0;
-                playerHealth.currentShield += 180;
-                playerHealth.maxShield += 10;
-            }
+            PlayerHealth player = hitRangeCollider.otherCollider.GetComponent&lt;PlayerHealth&gt;();
+            player.TakeDamage(enemy.damageAmount);
         }
+    }
 
-
-
-        else if (whichUpgrade == 20)
-        {
-            upgrade1 = true;
-            upgrade2 = false;
-            upgrade3 = false;
-            upgrade4 = false;
-            if (playerStats.healthPercentage &lt;= 20 &amp;&amp; upgrade1 &amp;&amp; 
-            !upgrade2 &amp;&amp; !upgrade3 &amp;&amp; !upgrade4)
-            {
-                playerMovement.currentMoveSpeed *= 1.2f;
-            }
-        }
-        else if (whichUpgrade == 21)
-        {
-            immunity.immunityIsUnlocked = true;
-        }
-        else if (whichUpgrade == 22)
-        {
-            upgrade1 = false;
-            upgrade2 = true;
-            upgrade3 = false;
-            upgrade4 = false;
-            if (playerStats.healthPercentage &lt;= 40 &amp;&amp; !upgrade1 &amp;&amp; 
-            upgrade2 &amp;&amp; !upgrade3 &amp;&amp; !upgrade4)
-            {
-                playerMovement.currentMoveSpeed *= 1.2f;
-            }
-        }
-        else if (whichUpgrade == 23)
-        {
-            float plusProcentSpeed = playerMovement.currentMoveSpeed / 100 * 10;
-            playerMovement.currentMoveSpeed += plusProcentSpeed;
-        }
-        else if (whichUpgrade == 24)
-        {
-            immunity.immunityTime += 0.5f;
-            immunity.cooldownTime -= 5;
-        }
-        else if (whichUpgrade == 25)
-        {
-            upgrade1 = false;
-            upgrade2 = false;
-            upgrade3 = true;
-            upgrade4 = false;
-            if (playerStats.healthPercentage &lt;= 40 &amp;&amp; !upgrade1 &amp;&amp; 
-            !upgrade2 &amp;&amp; upgrade3 &amp;&amp; !upgrade4)
-            {
-                playerMovement.currentMoveSpeed *= 1.6f;
-            }
-            immunity.immunityTime += 1.5f;
-            immunity.cooldownTime -= 5;
-        }
-        else if (whichUpgrade == 26)
-        {
-            upgrade1 = false;
-            upgrade2 = false;
-            upgrade3 = false;
-            upgrade4 = true;
-            if (playerStats.healthPercentage &lt;= 50 &amp;&amp; !upgrade1 &amp;&amp; 
-            !upgrade2 &amp;&amp; !upgrade3 &amp;&amp; upgrade4)
-            {
-                playerMovement.currentMoveSpeed *= 1.8f;
-            }
-            immunity.immunityTime += 2;
-            immunity.cooldownTime -= 5;
-        }
+    private IEnumerator AttackCooldown()
+    {
+        isOnAttackCooldown = true;
+        yield return new WaitForSeconds(enemy.timeBetweenAttacks);
+        enemy.animator.SetBool(&quot;Attack&quot;, false);
+        enemy.animator.SetBool(&quot;AttackMiss&quot;, false);
+        stateMachine.GoToDefaultState();
+        stateMachine.ResetTimers();
+        isOnAttackCooldown = false;
     }
 }
                             </code>
