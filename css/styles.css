@@ -11432,3 +11432,45 @@ input[type=checkbox]:checked ~ label > img {
 .subnav:hover .subnav-content {
   display: block;
 }
+
+
+@media (max-width: 992px) {
+  /* The subnavigation menu */
+.subnav {
+  float: left;
+  overflow: hidden;
+}
+
+/* Subnav button */
+.subnav .subnavbtn {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+/* Style the subnav content - positioned absolute */
+.subnav-content {
+  display: block;
+  position: relative;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+/* Style the subnav links */
+.subnav-content a {
+  float: left;
+  color: var(--bs-link-color);
+  text-decoration: underline;
+}
+
+/* Add a grey background color on hover */
+.subnav-content a:hover {
+  color: var(--bs-link-hover-color);
+}
+}
