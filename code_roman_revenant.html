@@ -24,12 +24,132 @@
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
                         <h1 class="mx-auto my-0 text-uppercase">Code Roman Revenant</h1>
+                        <h6 class="mx-auto my-0 text-uppercase">!Work In Progress!</h6>
                     </div>
                 </div>
             </div>
         </header>
         <div class="container col-lg-7 horizontal-line-custom"></div>
         <!-- Code-->
+        <div class="container px-8 px-lg-10">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
+                    <div class="own-column">
+                        <div class="own-code">
+                            <pre>
+                                <code>
+public enum States
+{
+    chasePlayer,
+    chaseNewPos,
+    attack,
+    abilityUse
+}
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        This enum has all the possable states the enemy can be in. They are in order from top to bottom, with top the least priority and bottom the most priority.
+                    </div>
+                    <div class="own-column">
+                        <div class="own-code">
+                            <pre>
+                                <code>
+//Making an reference to the enum
+[SerializeField] States currentState;
+private States defaultState;
+
+
+private void Start()
+{
+    defaultState = States.chasePlayer;
+    currentState = defaultState;
+}
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
+                            <source src="assets/video/Roman_Revenant_ClipOne.mp4" type="video/mp4" />
+                        </video>
+                        <div>
+                            The default state of the enemies. Chasing the player! 
+                            If there is no other state that wants to be activated or if it is done with the other state, it goes to this state.
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <div class="own-code">
+                            <pre>
+                                <code>
+    public void TriggerChaseNewPos()
+    {
+        newPosTimer += Time.deltaTime;
+        distanceToNewPos = Vector3.Distance(newPos, enemyNewPosGen.transform.position);
+        if (newPosTimer &gt;= randomTime)
+        {
+            WantsToBeNextState(States.chaseNewPos);
+        }
+
+        if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
+        {
+            ResetTimers();
+            GoToDefaultState();
+        }
+    }
+
+    public void TriggerAttack()
+    {
+        float distance = Vector3.Distance(playerTransform.transform.position, transform.position);
+        if (distance &lt; enemy.attackRange)
+        {
+            WantsToBeNextState(States.attack);
+        }
+        else if (currentState == States.attack)
+        {
+            currentState = defaultState;
+        }
+    }
+
+    private void TriggerAbilityUse()
+    {
+        abilityTimer += Time.deltaTime;
+        if (abilityTimer &gt;= enemy.abilityCooldown)
+        {
+            WantsToBeNextState(States.abilityUse);
+        }
+
+        if (currentState == States.abilityUse &amp;&amp; enemyAbility.EndAbility)
+        {
+            ResetTimers();
+            GoToDefaultState();
+            enemyAbility.EndAbility = false;
+        }
+    }
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
+                            <source src="assets/video/Roman_Revenant_ClipTwo.mp4" type="video/mp4" />
+                        </video>
+                        <div>
+                            This is the second state that the enemy can go to. 
+                            How it works: randomly there goes a timer off, and the code gives sort of a ping which is like "hey, I want to be the main state now".
+                            After that ping it goes trough a priority check if the "ping" state is higher priority then the current state. If it is, it becomes that state.
+
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <!--video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
+                            <source src="assets/video/Gameplay Roman Revenant.mp4" type="video/mp4" />
+                        </video-->
+                    </div>
+                </div>
+            </div>
+        </div>
         <section class="about-section-custom" id="Piggies Adventure Code">
             <div class="container px-8 px-lg-10">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
@@ -37,7 +157,6 @@
                         <h3 class="text-white text-center">
                             Enemies
                         </h3></br>
-
                         <button type="button" class="own-collapsible">StateMachine.cs</button>
                         <div class="own-content">
                             <pre>
