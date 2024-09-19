@@ -11537,8 +11537,15 @@ input[type=checkbox]:checked ~ label > img {
 }
 
 .own-column {
-  flex: 50%;
-  width: 50%;
+  flex: 100%;
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .own-column {
+    flex: 50%;
+    width: 50%;
+  }
 }
 
 .own-code {
