@@ -11543,8 +11543,16 @@ input[type=checkbox]:checked ~ label > img {
 
 @media (min-width: 992px) {
   .own-column {
-    flex: 50%;
-    width: 50%;
+    flex: 49.5%;
+    width: 49.5%;
+  }
+}
+
+@media (min-width: 992px) {
+  .own-column-img:hover {
+    transition: transform .5s !important;
+    cursor: zoom-in;
+    transform: scale(1.5);
   }
 }
 
@@ -11553,6 +11561,25 @@ input[type=checkbox]:checked ~ label > img {
   display: block;
   /*overflow: hidden;*/
   background-color: rgba(0, 0, 0, 0.045);
+  transition: transform .6s !important;
+}
+
+@media (min-width: 992px) {
+.own-code:hover{
+  cursor: zoom-in;
+  transform: scale(1.5);
+  width: 150%;
+}
+}
+
+@media (min-width: 992px) {
+.own-text{
+  margin-left: 1%;
+}
+}
+
+.own-text{
+  margin-bottom: 3rem;
 }
 
 .my-videooo {
