@@ -11572,14 +11572,16 @@ input[type=checkbox]:checked ~ label > img {
 }
 }
 
+@media (max-width: 992px) {
+.own-text{
+  margin-bottom: 3rem;
+}
+}
+
 @media (min-width: 992px) {
 .own-text{
   margin-left: 1%;
 }
-}
-
-.own-text{
-  margin-bottom: 3rem;
 }
 
 .my-videooo {
