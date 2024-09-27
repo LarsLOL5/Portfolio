@@ -233,6 +233,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
+
 public enum States
 {
     chasePlayer,
@@ -240,20 +241,23 @@ public enum States
     attack,
     abilityUse
 }
+
 public class StateMachine : MonoBehaviour
 {
+    [HideInInspector] public GameObject playerTransform;
+
+    //Making an reference to the enum
     [SerializeField] States currentState;
     private States defaultState;
 
+    [SerializeField] float abilityTimer;
     private float randomTime;
     private float newPosTimer;
-    [SerializeField] float abilityTimer;
 
     private bool newPosAlreadyCalledOnce;
     private bool attackAlreadyCalledOnce;
     private bool abilityUseAlreadyCalledOnce;
 
-    [HideInInspector] public GameObject playerTransform;
 
     private Vector3 newPos;
     private float distanceToNewPos;
@@ -262,6 +266,7 @@ public class StateMachine : MonoBehaviour
     private Enemy enemy;
     private EnemyAbility enemyAbility;
     private EnemyMainAttack enemyMainAttack;
+
     private void Start()
     {
         defaultState = States.chasePlayer;
@@ -293,12 +298,16 @@ public class StateMachine : MonoBehaviour
     public void TriggerChaseNewPos()
     {
         newPosTimer += Time.deltaTime;
-        distanceToNewPos = Vector3.Distance(newPos, enemyNewPosGen.transform.position);
+        distanceToNewPos = Vector3.Distance
+        (newPos, enemyNewPosGen.transform.position);
+
+        //If the "ping" goes off
         if (newPosTimer &gt;= randomTime)
         {
             WantsToBeNextState(States.chaseNewPos);
         }
 
+        //If the new target has been reached, reset timers and state
         if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
         {
             ResetTimers();
@@ -308,11 +317,16 @@ public class StateMachine : MonoBehaviour
 
     public void TriggerAttack()
     {
-        float distance = Vector3.Distance(playerTransform.transform.position, transform.position);
+        float distance = Vector3.Distance
+        (playerTransform.transform.position, transform.position);
+
+        //If the player is in range
         if (distance &lt; enemy.attackRange)
         {
             WantsToBeNextState(States.attack);
         }
+
+        //If the player is not in range, reset to default state
         else if (currentState == States.attack)
         {
             currentState = defaultState;
@@ -322,6 +336,8 @@ public class StateMachine : MonoBehaviour
     private void TriggerAbilityUse()
     {
         abilityTimer += Time.deltaTime;
+
+        //If the "ping" goes off
         if (abilityTimer &gt;= enemy.abilityCooldown)
         {
             WantsToBeNextState(States.abilityUse);
@@ -335,7 +351,7 @@ public class StateMachine : MonoBehaviour
         }
     }
 
-
+    //Priority check
     private void WantsToBeNextState(States possableNewState)
     {
         if (currentState &lt; possableNewState)
@@ -344,47 +360,61 @@ public class StateMachine : MonoBehaviour
         }
     }
 
+    //It becomes the new state
     private void GoToNextState(States newState)
     {
         currentState = newState;
     }
+
+    //All info what all the states do
     private void StateInfo()
     {
         if (currentState == States.chasePlayer)
         {
+            //The enemy is chasing the player
             enemy.enemyAgent.destination = playerTransform.transform.position;
         }
         if (currentState == States.chaseNewPos &amp;&amp; !newPosAlreadyCalledOnce)
         {
+            /*Function get called for generating new position
+            After that the enemy is chasing that new position (new pos)*/
             newPosAlreadyCalledOnce = true;
             newPos = enemyNewPosGen.CreateNewPos();
             enemy.enemyAgent.destination = newPos;
         }
         if (currentState == States.attack &amp;&amp; !attackAlreadyCalledOnce)
         {
+            //Function get called for attacking the player
             attackAlreadyCalledOnce = true;
             enemy.enemyAgent.speed = 0f;
             enemyMainAttack.CheckForDesync();
         }
-        if (currentState != States.attack &amp;&amp; currentState != States.abilityUse &amp;&amp; !enemy.isDead)
+        if (currentState != States.attack &amp;&amp; 
+        currentState != States.abilityUse &amp;&amp; !enemy.isDead)
         {
+            //Resetting the attack and speed
             enemy.canAttackPlayer = false;
             enemy.enemyAgent.speed = enemy.enemySpeed;
         }
         if (currentState == States.abilityUse &amp;&amp; !abilityUseAlreadyCalledOnce)
         {
             abilityUseAlreadyCalledOnce = true;
+
+            //Checking if the enemy has an ability
             if (enemy.data.Ability == EnemyAbilities.none)
             {
                 GoToDefaultState();
                 ResetTimers();
                 return;
             }
+
+            //If he has, call function to activate the ability
             enemy.enemyAgent.speed = 0;
             StartCoroutine(enemyAbility.DoAbilityAnimation());
         }
     }
 
+    //Reset to the default state (chasing the player)
     public void GoToDefaultState()
     {
         currentState = defaultState;
@@ -392,6 +422,8 @@ public class StateMachine : MonoBehaviour
         attackAlreadyCalledOnce = false;
         abilityUseAlreadyCalledOnce = false;
     }
+
+    //Resetting all timers
     public void ResetTimers()
     {
         newPosTimer = 0;
