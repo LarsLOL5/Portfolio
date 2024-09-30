@@ -30,10 +30,75 @@
         </header>
         <div class="container col-lg-7 horizontal-line-custom"></div>
         <!-- Code-->
+        <div class="container px-8 px-lg-10">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
+                    <div class="own-column">
+                        <!--div class="own-code">
+                            <pre>
+                                <code>
+public enum States
+{
+    chasePlayer,
+    chaseNewPos,
+    attack,
+    abilityUse
+}
+                                </code>
+                            </pre>
+                        </div-->
+                        <div class="own-column-img">
+                            <img class="img-fluid" src="assets/img/Tokyo_Glow_ImgOne.png" alt="..." width="400"/>
+                        </div>
+                    </div>
+                    <div class="own-column own-text">
+                        The car is build in Unity as a prefab. On TheCar itself there are a couple scripts. 
+                        For the input of the car, a boost manager and some more.
+                        Also there are the rigidbody and the box collider for the entire car.
+                    </br></br>
+                        TheCar has 2 child objects. One of them is the body and that contains the model of the car and all camera angles.
+                        The other one, Wheels, also has 2 childs. The first one for the colliders, which I will go deeper into in a second. 
+                        And the last one is for the models of the wheels.
+                    </div>
+                    <div class="own-space-between"></div>
+                    <div class="own-column">
+                        <div class="own-column-img">
+                            <img class="img-fluid" src="assets/img/Tokyo_Glow_ImgTwo.png" alt="..." width="400"/>
+                        </div>
+                    </div>
+                    <div class="own-column own-text">
+                        Each wheel has 3 components. First we have the transform, 
+                        which U can decide the position, rotation and scale of the collider of the wheel with.
+                    </br></br>
+                        The second component is the wheel collider. 
+                        It's a Unity component which u can put on your wheel and can tweek a lot.
+                        This is one of the most time comsuming thing about the car, because it has so many settings.
+                        One setting can change to car from having oversteer all the time to having understeer all the time.
+                    </br></br>
+                        And last but not least, the Wheel script. 
+                        By turning on/off the checkmarks u can decide if you want that wheel to be able to turn and if it can give power.
+                        That way u can decide if the car has front or rear wheel drive.
+                    </div>
+                    <div class="own-column">
+                        <div>
+                            Results:
+                        </div>
+                        <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
+                            <source src="assets/video/Tokyo_Glow_ClipOne.mp4" type="video/mp4" />
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
         <section class="about-section-custom" id="Tokyo Glow Code">
             <div class="container px-8 px-lg-10">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8">
+                        <h3 class="text-white text-center">
+                            The Full Scripts </br>
+                            |</br>
+                            v
+                        </h3></br>
                         <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_one.png" alt="..." width="250"/></br></br></br-->
                         <button type="button" class="own-collapsible">PlayerCarInput.cs</button>
                         <div class="own-content">
