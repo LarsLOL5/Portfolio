@@ -50,7 +50,8 @@ public enum States
                         </div>
                     </div>
                     <div class="own-column own-text">
-                        This enum has all the possable states the enemy can be in. They are in order from top to bottom, with top the least priority and bottom the most priority.
+                        This enum has all the possible states the enemy can be in. 
+                        They are in order from top to bottom, with the top having the least priority and the bottom having the most priority.
                     </div>
                     <div class="own-space-between"></div>
                     <div class="own-column">
@@ -131,12 +132,12 @@ private void GoToNextState(States newState)
                             </video>
                         </div></br>
                         <div class="own-text">
-                            The second state that the enemy can go to, the new pos state. 
-                            How it works: randomly there goes a timer off, and the code gives sort of a ping which is like "hey, I want to be the main state now".
-                            After that ping it goes trough a priority check if the "ping" state is higher priority then the current state. If it is, it becomes that state.
+                            The second state that the enemy can go to, is the new pos state. 
+                            How it works: randomly there goes a timer off, and the code gives sort of a ping which is like "Hey, I want to be the main state now".
+                            After that ping, it goes through a priority check if the "ping" state is a higher priority than the current state. If it is, it becomes that state.
                         </br></br>
-                            For the other state, ability use, I works the same as the new pos state. But for the other state, the attack state, its "ping" works different.
-                            The attack state gives a ping if the enemy is within a range of the player.
+                            For the other state, ability use, It works the same as the new pos state. But for the other state, the attack state, its "ping" works differently.
+                            The attack state gives a ping if the enemy is within range of the player.
                         </div>
                     </div>
                     <div class="own-column">
