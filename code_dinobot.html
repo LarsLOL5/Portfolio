@@ -18,6 +18,36 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/atom-one-dark.min.css">
   </head>
   <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+            <div class="container px-4 px-lg-5">
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="dinobot.html">Main Page</a></li>
+                        <li class="nav-item"><a class="nav-link" href="code_dinobot.html">Code Page</a></li>
+                        <div class="dropdown">
+                            <button onclick="myFunction()" class="dropbtn"><img src="./assets/img/Hamburger_icon.png" height="20px"></button>
+                            <div id="myDropdown" class="dropdown-content">
+                              <a href="roman_revenant.html">Roman Revenant</a>
+                              <a href="yoshi.html">Yoshi's Skyward Soar</a>
+                              <a href="tokyo_glow.html">Tokyo Glow</a>
+                              <a href="dinobot.html">Dinobot</a>
+                              <a href="piggies_adventure.html">Piggies Adventure</a></br>
+                              <a href="code_roman_revenant.html">Code Roman Revenant</a>
+                              <a href="code_yoshi.html">Code Yoshi's Skyward Soar</a>
+                              <a href="code_tokyo_glow.html">Code Tokyo Glow</a>
+                              <a href="code_dinobot.html">Code Dinobot</a>
+                              <a href="code_piggies_adventure.html">Code Piggies Adventure</a>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <!-- Masthead-->
         <header class="masthead">
             <div class="container px-lg-5 d-flex h-75 align-items-center justify-content-center">
@@ -29,6 +59,67 @@
             </div>
         </header>
         <div class="container col-lg-7 horizontal-line-custom"></div>
+        <!-- Code-->
+        <div class="container px-8 px-lg-10">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
+                    <div class="own-column">
+                        <!--div class="own-code">
+                            <pre>
+                                <code>
+public enum States
+{
+    chasePlayer,
+    chaseNewPos,
+    attack,
+    abilityUse
+}
+                                </code>
+                            </pre>
+                        </div-->
+                        <div class="own-column-img">
+                            <img class="img-fluid" src="assets/img/Tokyo_Glow_ImgOne.png" alt="..." width="400"/>
+                        </div>
+                    </div>
+                    <div class="own-column own-text">
+                        The car is build in Unity as a prefab. On TheCar itself there are a couple scripts. 
+                        For the input of the car, a boost manager and some more.
+                        Also there are the rigidbody and the box collider for the entire car.
+                    </br></br>
+                        TheCar has 2 child objects. One of them is the body and that contains the model of the car and all camera angles.
+                        The other one, Wheels, also has 2 childs. The first one for the colliders, which I will go deeper into in a second. 
+                        And the last one is for the models of the wheels.
+                    </div>
+                    <div class="own-space-between"></div>
+                    <div class="own-column">
+                        <div class="own-column-img">
+                            <img class="img-fluid" src="assets/img/Tokyo_Glow_ImgTwo.png" alt="..." width="400"/>
+                        </div>
+                    </div>
+                    <div class="own-column own-text">
+                        Each wheel has 3 components. First we have the transform, 
+                        which U can decide the position, rotation and scale of the collider of the wheel with.
+                    </br></br>
+                        The second component is the wheel collider. 
+                        It's a Unity component which u can put on your wheel and can tweek a lot.
+                        This is one of the most time comsuming thing about the car, because it has so many settings.
+                        One setting can change to car from having oversteer all the time to having understeer all the time.
+                    </br></br>
+                        And last but not least, the Wheel script. 
+                        By turning on/off the checkmarks u can decide if you want that wheel to be able to turn and if it can give power.
+                        That way u can decide if the car has front or rear wheel drive.
+                    </div>
+                    <div class="own-column">
+                        <div>
+                            Results:
+                        </div>
+                        <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
+                            <source src="assets/video/Tokyo_Glow_ClipOne.mp4" type="video/mp4" />
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Code-->
         <section class="about-section-custom" id="Dinobot Code">
             <div class="container px-8 px-lg-10">
@@ -693,6 +784,8 @@ public class UpgradesManager : MonoBehaviour
             </div>
         </section>
         <section class="padding-under-custom"></section>
+        <!-- Footer-->
+        <script src="js/scripts.js"></script>
         <script>
             var coll = document.getElementsByClassName("own-collapsible");
             var i;
