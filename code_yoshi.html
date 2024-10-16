@@ -54,7 +54,6 @@
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
                         <h1 class="mx-auto my-0 text-uppercase">Code Yoshi's Skyward Soar</h1>
-                        <p class="mx-auto my-0 text-uppercase">WORK IN PROGRESS!</p>
                     </div>
                 </div>
             </div>
@@ -79,43 +78,127 @@ public enum States
                             </pre>
                         </div-->
                         <div class="own-column-img">
-                            <img class="img-fluid" src="assets/img/Tokyo_Glow_ImgOne.png" alt="..." width="400"/>
+                            <img class="img-fluid" src="assets/img/Yoshi_Img_One.png" alt="..." width="400"/>
                         </div>
                     </div>
                     <div class="own-column own-text">
-                        The car is build in Unity as a prefab. On TheCar itself there are a couple scripts. 
-                        For the input of the car, a boost manager and some more.
-                        Also there are the rigidbody and the box collider for the entire car.
-                    </br></br>
-                        TheCar has 2 child objects. One of them is the body and that contains the model of the car and all camera angles.
-                        The other one, Wheels, also has 2 childs. The first one for the colliders, which I will go deeper into in a second. 
-                        And the last one is for the models of the wheels.
+                        For this project, I used the new input system. As you can see I went behavior-wise with invoke unity events. 
+                        I used this for walking and jumping, and I used the ability.</br>
+                        The walk and jump input is used in a very general PlayerMovement script.
+                        Below, I will go deeper into the ability input and ability scripts.
                     </div>
                     <div class="own-space-between"></div>
                     <div class="own-column">
-                        <div class="own-column-img">
-                            <img class="img-fluid" src="assets/img/Tokyo_Glow_ImgTwo.png" alt="..." width="400"/>
+                        <div class="own-code">
+                            <pre>
+                                <code>
+//This function gets called for the input
+public void OnAbility(InputAction.CallbackContext context)
+{
+    pressingAbility = context.ReadValue&lt;float&gt;();
+}
+
+private void Update()
+{
+//If you press the input (space bar) and you're not on cooldown
+    if (pressingAbility == 1 &amp;&amp; !onCooldown)
+    {
+        onCooldown = true;
+        StartCoroutine(OnCooldown());
+        StartCoroutine(InAbility());
+    }
+    //If you're in the ability
+    if (inAbility)
+    {
+        FindObjectOfType&lt;UpgradeSystem&gt;().GetUpgradeStates();
+        playerWings.SetActive(true);
+        onCooldownTime = 0;
+    }
+    //If you're not in the ability
+    else
+    {
+        onCooldownTime += Time.deltaTime;
+        playerWings.SetActive(false);
+        FindObjectOfType&lt;UpgradeSystem&gt;()
+        .shieldObject.SetActive(false);
+        FindObjectOfType&lt;UpgradeSystem&gt;()
+        .shield.shieldHealth = 0;
+        slider.value = onCooldownTime;
+    }
+}
+                                </code>
+                            </pre>
                         </div>
                     </div>
                     <div class="own-column own-text">
-                        Each wheel has 3 components. First we have the transform, 
-                        which U can decide the position, rotation and scale of the collider of the wheel with.
+                        The top function gets all the input from the player, in this case, if the player presses the space bar.
+                        And it reads the value as a float, so that means: 0=false, not true, and 1=true. 
+                        So if you press the space bar it will be 1 and when you're not pressing it, it's 0.
                     </br></br>
-                        The second component is the wheel collider. 
-                        It's a Unity component which u can put on your wheel and can tweek a lot.
-                        This is one of the most time comsuming thing about the car, because it has so many settings.
-                        One setting can change to car from having oversteer all the time to having understeer all the time.
+                        And if you look in the update in the if statement if the input is 1, so when you press the space bar, go into ability and on cooldown. 
+                        That's necessary because otherwise you could just spam the space bar and reactivate the ability over and over again.
                     </br></br>
-                        And last but not least, the Wheel script. 
-                        By turning on/off the checkmarks u can decide if you want that wheel to be able to turn and if it can give power.
-                        That way u can decide if the car has front or rear wheel drive.
+                        Lastly, if you are in the ability you will get wings visually and the cooldown timer starts. The function that gets called I will go into detail below.
+                    </div>
+                    <div class="own-column">
+                        <div class="own-code">
+                            <pre>
+                                <code>
+//If enough wings collected, upgrade
+public void GettingUpgrade()
+{
+    if (upgradePart &gt;= upgradePartsNeeded &amp;&amp; upgradeState &lt; 3)
+    {
+        upgradeState += 1;
+        upgradePart = 0;
+        upgradePartsNeeded = upgradePartsNeeded + 2;
+    }
+}
+
+//All upgrades
+public void GetUpgradeStates()
+{
+    if (upgradeState == 1)
+    {
+        // 20% more move speed while walking & sprinting
+        playerMovement.moveSpeed = playerMovement.boostedWalkMoveSpeed;
+        playerMovement.moveSpeed = playerMovement.boostedSprintMoveSpeed;
+    }
+
+    if (upgradeState == 2)
+    {
+        // 20% more move speed while walking & sprinting + 20% jump boost
+        playerMovement.moveSpeed = playerMovement.boostedWalkMoveSpeed;
+        playerMovement.moveSpeed = playerMovement.boostedSprintMoveSpeed;
+        playerMovement.jumpForce = playerMovement.boostedJumpForce;
+    }
+    if (upgradeState == 3)
+    {
+        /* 2 Extra Health + 
+        20% more move speed while walking & sprinting + 20% jump boost */
+        shield.shieldHealth = 2;
+        shieldObject.SetActive(true);
+        playerMovement.moveSpeed = playerMovement.boostedWalkMoveSpeed;
+        playerMovement.jumpForce = playerMovement.boostedJumpForce;
+    }
+}
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="own-column own-text">
+                        The function at the top is keeping track if you have enough wing parts collected. And if you do, you will go to the next upgrade state.
+                        But the new upgrade state has more parts you need to collect to go to the one after that stage. So it gets more difficult to level up with each level.
+                    </br></br>
+                        The function below is for what the upgrade is, there are 3 stages. The higher you go in stage number, the stronger you get. 
+                        This makes more sense because you will also need more parts to collect, so it's scaled very nicely.
                     </div>
                     <div class="own-column">
                         <div>
                             Results:
                         </div>
                         <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                            <source src="assets/video/Tokyo_Glow_ClipOne.mp4" type="video/mp4" />
+                            <source src="assets/video/Yoshi_ClipOne.mp4" type="video/mp4" />
                         </video>
                     </div>
                 </div>
@@ -131,159 +214,177 @@ public enum States
                             v
                         </h3></br>
                         <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_one.png" alt="..." width="250"/></br></br></br-->
-                        <button type="button" class="own-collapsible">PlayerCarInput.cs</button>
+                        <button type="button" class="own-collapsible">AngelForm.cs</button>
                         <div class="own-content">
                         <pre>
                             <code>
 using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
-public class PlayerCarInput : MonoBehaviour
+public class AngelForm : MonoBehaviour
 {
-    public float Power;
-    public float Angle;
+    //Input
+    private PlayerInput playerInput;
+    private InputAction abilityInput;
 
-    public CarInput input;
-    public Wheel[] wheels;
+    private float pressingAbility;
 
-    private float throttleInput;
-    private float throttleDamp;
+    //Cooldown
+    public float cooldownTime;
+    private bool onCooldown;
 
-    private float steeringInput;
-    private float steeringDamp;
+    //Ability
+    [SerializeField] float abilityTime;
+    private bool inAbility;
 
-    public float dampenSpeed;
-    private KmhCounter kmhCounter;
+    [SerializeField] GameObject playerWings;
 
-    [SerializeField] private bool IsPlayer2;
+    [SerializeField] Slider slider;
+    [SerializeField] TextMeshProUGUI readyText;
 
-    private void Awake()
+    private float onCooldownTime;
+
+    private void Start()
     {
-        kmhCounter = FindObjectOfType&lt;KmhCounter&gt;();
-        input = new CarInput();
+        playerInput = new PlayerInput();
+        abilityInput = playerInput.Player.Walk;
+        abilityInput.Enable();
     }
-    private void OnEnable()
+
+    public void OnAbility(InputAction.CallbackContext context)
     {
-        input.Enable();
-        if (!IsPlayer2)
+        pressingAbility = context.ReadValue&lt;float&gt;();
+    }
+
+    private void Update()
+    {
+        if (pressingAbility == 1 &amp;&amp; !onCooldown)
         {
-            input.Car.Throttle.performed += ApplyThrottle;
-            input.Car.Throttle.canceled += ReleaseThrottle;
-            input.Car.Steering.performed += ApplySteering;
-            input.Car.Steering.canceled += ReleaseSteering;
+            onCooldown = true;
+            StartCoroutine(OnCooldown());
+            StartCoroutine(InAbility());
+        }
+        if (inAbility)
+        {
+            FindObjectOfType&lt;UpgradeSystem&gt;().GetUpgradeStates();
+            playerWings.SetActive(true);
+            onCooldownTime = 0;
         }
         else
         {
-            input.Car.ThrottleP2.performed += ApplyThrottle;
-            input.Car.ThrottleP2.canceled += ReleaseThrottle;
-            input.Car.SteeringP2.performed += ApplySteering;
-            input.Car.SteeringP2.canceled += ReleaseSteering;
+            onCooldownTime += Time.deltaTime;
+            playerWings.SetActive(false);
+            FindObjectOfType&lt;UpgradeSystem&gt;().shieldObject.SetActive(false);
+            FindObjectOfType&lt;UpgradeSystem&gt;().shield.shieldHealth = 0;
+            slider.value = onCooldownTime;
         }
-        
-    }
-    private void Update()
-    {
-        AngleBasedOnSpeed();
-        throttleDamp = DampenedInput(throttleInput, throttleDamp);
-        steeringDamp = DampenedInput(steeringInput, steeringDamp);
-    }
-    private void OnDisable()
-    {
-        input.Disable();
-    }
-    private float DampenedInput(float input, float output)
-    {
-        return Mathf.Lerp(output, input, Time.deltaTime * dampenSpeed);
-    }
-    private void ApplyThrottle(InputAction.CallbackContext value)
-    {
-        throttleInput = value.ReadValue&lt;float&gt;();
-    }
-    private void ReleaseThrottle(InputAction.CallbackContext value)
-    {
-        throttleInput = 0;
-    }
 
-    private void ApplySteering(InputAction.CallbackContext value)
-    {
-        steeringInput = value.ReadValue&lt;float&gt;();
-    }
-    private void ReleaseSteering(InputAction.CallbackContext value)
-    {
-        steeringInput = 0;
-    }
-
-    private void FixedUpdate()
-    {
-        foreach (Wheel wheel in wheels)
+        if (!onCooldown)
         {
-            wheel.Accelerate(throttleDamp * Power);
-            wheel.Turn(steeringDamp * Angle);
+            readyText.text = &quot;READY!&quot;;
+        }
+        else
+        {
+            readyText.text = &quot;&quot;;
         }
     }
 
-    private void AngleBasedOnSpeed()
+    private IEnumerator InAbility()
     {
-        Angle = 30 - kmhCounter.speed * 0.1f;
+        inAbility = true;
+        yield return new WaitForSeconds(abilityTime);
+        inAbility = false;
+    }
+
+    private IEnumerator OnCooldown()
+    {
+        yield return new WaitForSeconds(cooldownTime);
+        onCooldown = false;
     }
 }
+
                             </code>
                         </pre>
                         </div>
                         <div class="padding-custom-4"></div>
                         <!--img class="img-fluid" src="assets/img/Code_Tokyo_Glow_part_two.png" alt="..." width="500"/-->
-                        <button type="button" class="own-collapsible">Wheel.cs</button>
+                        <button type="button" class="own-collapsible">UpgradeSystem.cs</button>
                         <div class="own-content">
                         <pre>
                             <code>
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Wheel : MonoBehaviour
+public class UpgradeSystem : MonoBehaviour
 {
-    public bool isPowered;
-    public bool canTurn;
-    public GameObject Visual;
+    [SerializeField] float upgradeState;
+    [SerializeField] float upgradePartsNeeded;
+    public float upgradePart;
 
-    public float steeringAngle;
+    private PlayerMovement playerMovement;
+    public Shield shield;
 
-    private WheelCollider wheelCollider;
+    public GameObject shieldObject;
 
-    private void Start()
+    //UI
+    [SerializeField] Slider slider;
+    [SerializeField] TextMeshProUGUI upgradePartsText;
+    [SerializeField] TextMeshProUGUI upgradeStateText;
+
+    private void Awake()
     {
-        wheelCollider = GetComponent&lt;WheelCollider&gt;();
+        playerMovement = FindObjectOfType&lt;PlayerMovement&gt;();
+        shield = FindObjectOfType&lt;Shield&gt;();
+        shieldObject.SetActive(false);
+    }
+
+    public void GettingUpgrade()
+    {
+        if (upgradePart &gt;= upgradePartsNeeded &amp;&amp; upgradeState &lt; 3)
+        {
+            upgradeState += 1;
+            upgradePart = 0;
+            upgradePartsNeeded = upgradePartsNeeded + 2;
+        }
     }
 
     private void Update()
     {
-        Vector3 position;
-        Quaternion rotation;
-        wheelCollider.GetWorldPose(out position, out rotation);
-        Visual.transform.position = position;
+        //UI
+        slider.value = upgradePart;
+        slider.maxValue = upgradePartsNeeded;
+        upgradePartsText.text = upgradePart.ToString() + &quot; / &quot; + upgradePartsNeeded.ToString();
+        upgradeStateText.text = &quot;Power: &quot; + upgradeState.ToString();
     }
 
-    public void Accelerate(float power)
+    public void GetUpgradeStates()
     {
-        if (isPowered)
+        if (upgradeState == 1)
         {
-            wheelCollider.motorTorque = power;
+            // 20% more move speed while walking & sprinting
+            playerMovement.moveSpeed = playerMovement.boostedWalkMoveSpeed;
+            playerMovement.moveSpeed = playerMovement.boostedSprintMoveSpeed;
         }
-    }
-
-    public void Turn(float angle)
-    {
-        if (canTurn)
+    
+        if (upgradeState == 2)
         {
-            wheelCollider.steerAngle = angle;
+            // 20% more move speed while walking & sprinting + 20% jump boost
+            playerMovement.moveSpeed = playerMovement.boostedWalkMoveSpeed;
+            playerMovement.moveSpeed = playerMovement.boostedSprintMoveSpeed;
+            playerMovement.jumpForce = playerMovement.boostedJumpForce;
         }
-    }
-
-    public void Brake(float power)
-    {
-        wheelCollider.brakeTorque = power;
+        if (upgradeState == 3)
+        {
+            // 2 Extra Health + 20% more move speed while walking & sprinting+ 20% jump boost
+            shield.shieldHealth = 2;
+            shieldObject.SetActive(true);
+            playerMovement.moveSpeed = playerMovement.boostedWalkMoveSpeed;
+            playerMovement.jumpForce = playerMovement.boostedJumpForce;
+        }
     }
 }
                             </code>
