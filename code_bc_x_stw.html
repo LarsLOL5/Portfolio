@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Code_Roman_Revenant</title>
+        <title>Code_BC_X_STW</title>
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -14,7 +14,7 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
-        <title>Code_Roman_Revenant</title>
+        <title>Code_BC_X_STW</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/atom-one-dark.min.css">
   </head>
   <body id="page-top">
@@ -28,7 +28,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="roman_revenant.html">Project Page</a></li>
+                        <li class="nav-item"><a class="nav-link" href="bc_x_stw.html">Project Page</a></li>
                         <!--li class="nav-item"><a class="nav-link" href="code_roman_revenant.html">Code Page</a></li-->
                         <div class="dropdown">
                             <button onclick="myFunction()" class="dropbtn"><img src="./assets/img/Hamburger_icon.png" height="20px"></button>
@@ -57,7 +57,7 @@
             <div class="container px-lg-5 d-flex h-75 align-items-center justify-content-center">
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
-                        <h1 class="mx-auto my-0 text-uppercase">Code Roman Revenant</h1>
+                        <h1 class="mx-auto my-0 text-uppercase">Code BC X STW</h1>
                         <!--h6 class="mx-auto my-0 text-uppercase">!Work In Progress!</h6-->
                     </div>
                 </div>
@@ -68,39 +68,79 @@
         <div class="container px-8 px-lg-10">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
+                    <div class="text-center justify-content-center mt-4 mb-1">
+                        <h3>Problem</h3>
+                        <p>
+                            The problem was that the enemies waited until the group before them was done with all the spawning before they started spawning.
+                            So I could only spawn 1 group at a time. 
+                            And that's a big deal, 
+                            because let's say if I constantly spawn a group and I want to spawn a boss in between the spawning of the group, that wouldn't be possible.
+                        </p>
+                    </div>
                     <div class="own-column">
                         <div class="own-code">
                             <pre>
                                 <code>
-public enum States
+private IEnumerator SpawnUnits()
 {
-    chasePlayer,
-    chaseNewPos,
-    attack,
-    abilityUse
+    foreach(SpawnInfo group in spawnInfo)
+    {
+        //Code for spawning
+        int currentSpawnAmountLeft = group.spawnAmount;
+        yield return new WaitForSeconds(group.firstUnitSpawnTime);
+        for (int i = 0; i &lt; group.spawnAmount; i++)
+        {
+            if (currentSpawnAmountLeft &lt;= 0)
+            {
+                yield return null;
+            }
+            GameObject newUnitGO = Instantiate
+            (group.enemyUnitGroup, spawnLocations.position, spawnLocations.rotation);
+            Unit newUnit = newUnitGO.GetComponent&lt;Unit&gt;();
+            newUnit.SetFaction(0); // 0 are the enemies, 1 are the friendlies
+            enemyUnits.Add(newUnit);
+            currentSpawnAmountLeft -= 1;
+            yield return new WaitForSeconds(group.delayBetweenSpawns);
+        }
+    }
+    yield return null;
 }
                                 </code>
                             </pre>
                         </div>
                     </div>
-                    <div class="own-column own-text">
-                        This enum has all the possible states the enemy can be in. 
-                        They are in order from top to bottom, with the top having the least priority and the bottom having the most priority.
+                    <div class="own-column">
+                        <div class="own-column-img">
+                            <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
+                                <source src="assets/video/Bc_x_stw_ClipOne.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                    </div>
+                    <div class="text-center justify-content-center mt-4 mb-1 mx-auto">
+                        <h3>Solution</h3>
+                        <p>
+                            The solution is to go in a second coroutine and spawn the enemies there. 
+                            Different from how it was, now every group starts its own coroutine.
+                            And I just give the variable of the foreach to the second coroutine so it still knows its data from the struct.
+                        </p>
                     </div>
                     <div class="own-space-between"></div>
                     <div class="own-column">
                         <div class="own-code">
                             <pre>
                                 <code>
-//Making an reference to the enum
-[SerializeField] States currentState;
-private States defaultState;
-
-
-private void Start()
+private IEnumerator SpawnUnits()
 {
-    defaultState = States.chasePlayer;
-    currentState = defaultState;
+    foreach(SpawnInfo group in spawnInfo)
+    {
+        StartCoroutine(PerGroup(group));
+    }
+    yield return null;
+}
+
+private IEnumerator PerGroup(SpawnInfo group)
+{
+    //Code for spawning
 }
                                 </code>
                             </pre>
@@ -109,147 +149,18 @@ private void Start()
                     <div class="own-column">
                         <div class="own-column-img">
                             <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                                <source src="assets/video/Roman_Revenant_ClipOne.mp4" type="video/mp4" />
+                                <source src="assets/video/Bc_x_stw_ClipTwo.mp4" type="video/mp4" />
                             </video>
-                            <!--div style="padding:75% 0 0 0;position:relative;">
-                                <iframe src="https://player.vimeo.com/video/1019216699?loop=1&amp;title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Roman_Revenant_ClipOne"></iframe>
-                            </div-->
-                            <script src="https://player.vimeo.com/api/player.js"></script>
-                        </div>
-                        <div class="own-text">
-                            The default state of the enemies. Chasing the player! 
-                            If there is no other state that wants to be activated or if it is done with the other state, it goes to this state.
                         </div>
                     </div>
-                    <div class="own-column">
-                        <div class="own-code">
-                            <pre>
-                                <code>
-public void TriggerChaseNewPos()
-{
-    newPosTimer += Time.deltaTime;
-    distanceToNewPos = Vector3.Distance
-    (newPos, enemyNewPosGen.transform.position);
-
-    //If the "ping" goes off
-    if (newPosTimer &gt;= randomTime)
-    {
-        WantsToBeNextState(States.chaseNewPos);
-    }
-
-    //If the new target has been reached, reset timers and state
-    if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
-    {
-        ResetTimers();
-        GoToDefaultState();
-    }
-}
-
-//Priority check
-private void WantsToBeNextState(States possableNewState)
-{
-    if (currentState &lt; possableNewState)
-    {
-        GoToNextState(possableNewState);
-    }
-}
-
-//It becomes the new state
-private void GoToNextState(States newState)
-{
-    currentState = newState;
-}
-                                </code>
-                            </pre>
-                        </div>
-                    </div>
-                    <div class="own-column">
-                        <div class="own-column-img">
-                            <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                                <source src="assets/video/Roman_Revenant_ClipTwo.mp4" type="video/mp4" />
-                            </video>
-                        </div></br>
-                        <div class="own-text">
-                            The second state that the enemy can go to, is the new pos state. 
-                            How it works: randomly there goes a timer off, and the code gives sort of a ping which is like "Hey, I want to be the main state now".
-                            After that ping, it goes through a priority check if the "ping" state is a higher priority than the current state. If it is, it becomes that state.
-                        </br></br>
-                            For the other state, ability use, It works the same as the new pos state. But for the other state, the attack state, its "ping" works differently.
-                            The attack state gives a ping if the enemy is within range of the player.
-                        </div>
-                    </div>
-                    <div class="own-column">
-                        <div class="own-code">
-                            <pre>
-                                <code>
-private void StateInfo()
-{
-    if (currentState == States.chasePlayer)
-    {
-        //The enemy is chasing the player
-        enemy.enemyAgent.destination = playerTransform.transform.position;
-    }
-    if (currentState == States.chaseNewPos &amp;&amp; !newPosAlreadyCalledOnce)
-    {
-        /*Function get called for generating new position
-        After that the enemy is chasing that new position (new pos)*/
-        newPosAlreadyCalledOnce = true;
-        newPos = enemyNewPosGen.CreateNewPos();
-        enemy.enemyAgent.destination = newPos;
-    }
-    if (currentState == States.attack &amp;&amp; !attackAlreadyCalledOnce)
-    {
-        //Function get called for attacking the player
-        attackAlreadyCalledOnce = true;
-        enemy.enemyAgent.speed = 0f;
-        enemyMainAttack.CheckForDesync();
-    }
-    if (currentState != States.attack &amp;&amp; 
-    currentState != States.abilityUse &amp;&amp; !enemy.isDead)
-    {
-        //Resetting the attack and speed
-        enemy.canAttackPlayer = false;
-        enemy.enemyAgent.speed = enemy.enemySpeed;
-    }
-    if (currentState == States.abilityUse &amp;&amp; !abilityUseAlreadyCalledOnce)
-    {
-        abilityUseAlreadyCalledOnce = true;
-        //Checking if the enemy has an ability
-        if (enemy.data.Ability == EnemyAbilities.none)
-        {
-            GoToDefaultState();
-            ResetTimers();
-            return;
-        }
-        //If he has, call function to activate the ability
-        enemy.enemyAgent.speed = 0;
-        StartCoroutine(enemyAbility.DoAbilityAnimation());
-    }
-}
-                                </code>
-                            </pre>
-                        </div>
-                    </div>
-                    <div class="own-column">
-                        <!--div class="own-column-img">
-                            <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                                <source src="assets/video/Roman_Revenant_ClipOne.mp4" type="video/mp4" />
-                            </video>
-                        </div-->
-                        <div class="own-text">
-                            This function manages what is going to happen if it's in a certain state. 
-                            I only want the function to be called once in the if statement, so that's why there is a "! -any state- AlreadyCalledOnce" and the end of all the if statements
-                            and a "= true" in the first line in the if statements.
-                        </div>
-                    </div>
-                    <div class="own-column">
+                    <!--div class="own-column">
                         <div>
                             Results:
                         </div>
                         <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
                             <source src="assets/video/Roman_Revenant_ClipThree.mp4" type="video/mp4" />
                         </video>
-                    </div>
+                    </div-->
                 </div>
             </div>
         </div>
@@ -262,214 +173,76 @@ private void StateInfo()
                             |</br>
                             v
                         </h3></br>
-                        <button type="button" class="own-collapsible">StateMachine.cs</button>
+                        <button type="button" class="own-collapsible">SpawnManager.cs</button>
                         <div class="own-content">
                             <pre>
                                 <code>
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using UnityEngine;
+using UnityEngine.Events;
 
-public enum States
+public class SpawnManager : MonoBehaviour
 {
-    chasePlayer,
-    chaseNewPos,
-    attack,
-    abilityUse
-}
+    // Instantiating this script
+    public static SpawnManager Instance { get; private set; }
 
-public class StateMachine : MonoBehaviour
-{
-    [HideInInspector] public GameObject playerTransform;
+    public List&lt;Transform&gt; spawnLocations = new();
+    public List&lt;Unit&gt; enemyUnits = new();
 
-    //Making an reference to the enum
-    [SerializeField] States currentState;
-    private States defaultState;
+    public List&lt;SpawnInfo&gt; spawnInfo = new();
 
-    [SerializeField] float abilityTimer;
-    private float randomTime;
-    private float newPosTimer;
-
-    private bool newPosAlreadyCalledOnce;
-    private bool attackAlreadyCalledOnce;
-    private bool abilityUseAlreadyCalledOnce;
-
-
-    private Vector3 newPos;
-    private float distanceToNewPos;
-
-    private EnemyNewPosGeneration enemyNewPosGen;
-    private Enemy enemy;
-    private EnemyAbility enemyAbility;
-    private EnemyMainAttack enemyMainAttack;
+    private void Awake()
+    {
+        // Making it a singleton
+        if (Instance == null)
+        {
+            Instance = this;
+        } 
+        else
+        {
+            Debug.LogError(&quot;Another SpawnManager is in the scene!!&quot;);
+        }
+    }
 
     private void Start()
     {
-        defaultState = States.chasePlayer;
-        currentState = defaultState;
-        randomTime = UnityEngine.Random.Range(1, 10);
-
-        enemyNewPosGen = GetComponent&lt;EnemyNewPosGeneration&gt;();
-        enemy = GetComponent&lt;Enemy&gt;();
-        enemyAbility = GetComponent&lt;EnemyAbility&gt;();
-        enemyMainAttack = GetComponent&lt;EnemyMainAttack&gt;();
+        StartCoroutine(SpawnUnitGroups());
     }
 
-    private void Update()
+    private IEnumerator SpawnUnitGroups()
     {
-        if (enemy == null)
+        foreach(SpawnInfo group in spawnInfo)
         {
-            return;
+            StartCoroutine(PerGroup(group));
         }
-        if (playerTransform == null)
-        {
-            playerTransform = GameObject.FindWithTag(&quot;Player&quot;);
-        }
-        StateInfo();
-        TriggerChaseNewPos();
-        TriggerAbilityUse();
-        TriggerAttack();
+        yield return null;
     }
 
-    public void TriggerChaseNewPos()
+    private IEnumerator PerGroup(SpawnInfo group)
     {
-        newPosTimer += Time.deltaTime;
-        distanceToNewPos = Vector3.Distance
-        (newPos, enemyNewPosGen.transform.position);
-
-        //If the "ping" goes off
-        if (newPosTimer &gt;= randomTime)
+        // Code for spawning each enemy
+        int currentSpawnAmountLeft = group.spawnAmount;
+        yield return new WaitForSeconds(group.firstUnitSpawnTime);
+        for (int i = 0; i &lt; group.spawnAmount; i++)
         {
-            WantsToBeNextState(States.chaseNewPos);
-        }
-
-        //If the new target has been reached, reset timers and state
-        if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
-        {
-            ResetTimers();
-            GoToDefaultState();
-        }
-    }
-
-    public void TriggerAttack()
-    {
-        float distance = Vector3.Distance
-        (playerTransform.transform.position, transform.position);
-
-        //If the player is in range
-        if (distance &lt; enemy.attackRange)
-        {
-            WantsToBeNextState(States.attack);
-        }
-
-        //If the player is not in range, reset to default state
-        else if (currentState == States.attack)
-        {
-            currentState = defaultState;
-        }
-    }
-
-    private void TriggerAbilityUse()
-    {
-        abilityTimer += Time.deltaTime;
-
-        //If the "ping" goes off
-        if (abilityTimer &gt;= enemy.abilityCooldown)
-        {
-            WantsToBeNextState(States.abilityUse);
-        }
-
-        if (currentState == States.abilityUse &amp;&amp; enemyAbility.EndAbility)
-        {
-            ResetTimers();
-            GoToDefaultState();
-            enemyAbility.EndAbility = false;
-        }
-    }
-
-    //Priority check
-    private void WantsToBeNextState(States possableNewState)
-    {
-        if (currentState &lt; possableNewState)
-        {
-            GoToNextState(possableNewState);
-        }
-    }
-
-    //It becomes the new state
-    private void GoToNextState(States newState)
-    {
-        currentState = newState;
-    }
-
-    //All info what all the states do
-    private void StateInfo()
-    {
-        if (currentState == States.chasePlayer)
-        {
-            //The enemy is chasing the player
-            enemy.enemyAgent.destination = playerTransform.transform.position;
-        }
-        if (currentState == States.chaseNewPos &amp;&amp; !newPosAlreadyCalledOnce)
-        {
-            /*Function get called for generating new position
-            After that the enemy is chasing that new position (new pos)*/
-            newPosAlreadyCalledOnce = true;
-            newPos = enemyNewPosGen.CreateNewPos();
-            enemy.enemyAgent.destination = newPos;
-        }
-        if (currentState == States.attack &amp;&amp; !attackAlreadyCalledOnce)
-        {
-            //Function get called for attacking the player
-            attackAlreadyCalledOnce = true;
-            enemy.enemyAgent.speed = 0f;
-            enemyMainAttack.CheckForDesync();
-        }
-        if (currentState != States.attack &amp;&amp; 
-        currentState != States.abilityUse &amp;&amp; !enemy.isDead)
-        {
-            //Resetting the attack and speed
-            enemy.canAttackPlayer = false;
-            enemy.enemyAgent.speed = enemy.enemySpeed;
-        }
-        if (currentState == States.abilityUse &amp;&amp; !abilityUseAlreadyCalledOnce)
-        {
-            abilityUseAlreadyCalledOnce = true;
-
-            //Checking if the enemy has an ability
-            if (enemy.data.Ability == EnemyAbilities.none)
+            if (currentSpawnAmountLeft &lt;= 0)
             {
-                GoToDefaultState();
-                ResetTimers();
-                return;
+                yield return null;
             }
-
-            //If he has, call function to activate the ability
-            enemy.enemyAgent.speed = 0;
-            StartCoroutine(enemyAbility.DoAbilityAnimation());
+            GameObject newUnitGO = Instantiate
+            (group.enemyUnitGroup, spawnLocations[0].position, spawnLocations.rotation);
+            Unit newUnit = newUnitGO.GetComponent&lt;Unit&gt;();
+            newUnit.SetFaction(0); // 0 are the enemies, 1 are the friendlies
+            enemyUnits.Add(newUnit);
+            currentSpawnAmountLeft -= 1;
+            yield return new WaitForSeconds(group.delayBetweenSpawns);
         }
-    }
-
-    //Reset to the default state (chasing the player)
-    public void GoToDefaultState()
-    {
-        currentState = defaultState;
-        newPosAlreadyCalledOnce = false;
-        attackAlreadyCalledOnce = false;
-        abilityUseAlreadyCalledOnce = false;
-    }
-
-    //Resetting all timers
-    public void ResetTimers()
-    {
-        newPosTimer = 0;
-        randomTime = UnityEngine.Random.Range(1, 10);
-        abilityTimer = 0;
+        yield return null;
     }
 }
+
                                 </code>
                             </pre>
                         </div>
@@ -761,7 +534,7 @@ public class EnemyMainAttack : MonoBehaviour
                         <div class="padding-custom-2"></div>
                         <div class="text-center">
                             <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
-                            <a class="btn btn-primary" href="roman_revenant.html">Roman Revenant</a>
+                            <a class="btn btn-primary" href="bc_x_stw.html">BC X STW</a>
                             <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
                             <a class="btn btn-primary" href="index.html#projects">Home Page</a>
                         </div>
