@@ -156,23 +156,6 @@ public class ShootPlayerPurple : MonoBehaviour
         <script src="js/scripts.js"></script>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            var coll = document.getElementsByClassName("own-collapsible");
-            var i;
-            
-            for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("own-active");
-                var content = this.nextElementSibling;
-            
-                if (!content.style.display || content.style.display === "block") {
-                  content.style.display = "none";
-                } else {
-                  content.style.display = "block";
-                }
-              });
-            }
-        </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script>
   </body>

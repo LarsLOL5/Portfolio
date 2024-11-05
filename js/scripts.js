@@ -72,4 +72,20 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     });
 
+    var coll = document.getElementsByClassName("own-collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+        this.classList.toggle("own-active");
+        var content = this.nextElementSibling;
+
+    if (!content.style.display || content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+
 });
