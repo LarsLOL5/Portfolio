@@ -7,12 +7,12 @@
         <meta name="author" content="Lars Pluijmakers" />
         <title>Code BC X STW</title>
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-        <!-- Font Awesome icons (free version)-->
+        <!-- Font icons-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
         <!-- Google fonts-->
         <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
-        <!-- Core theme CSS (includes Bootstrap)-->
+        <!-- Core theme CSS-->
         <link href="css/styles.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/atom-one-dark.min.css">
   </head>
@@ -28,7 +28,6 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a class="nav-link" href="bc_x_stw.html">Project Page</a></li>
-                        <!--li class="nav-item"><a class="nav-link" href="code_roman_revenant.html">Code Page</a></li-->
                         <div class="dropdown">
                             <button onclick="ShowNavbar()" class="dropbtn"><img src="./assets/img/Hamburger_icon.png" height="20px"></button>
                             <div id="myDropdown" class="dropdown-content">
@@ -44,7 +43,7 @@
                                 <a href="code_piggies_adventure.html">Code Piggies Adventure</a>
                                 <p class="mb-0 text-black-50 mt-2">In development:</p>
                                 <a href="bc_x_stw.html">BC X STW</a>
-                                <a href="bc_x_stw.html">Code BC X STW</a>
+                                <a href="code_bc_x_stw.html">Code BC X STW</a>
                             </div>
                         </div>
                     </ul>
@@ -57,7 +56,6 @@
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
                         <h1 class="mx-auto my-0 text-uppercase">Code BC X STW</h1>
-                        <!--h6 class="mx-auto my-0 text-uppercase">!Work In Progress!</h6-->
                     </div>
                 </div>
             </div>
@@ -152,14 +150,6 @@ private IEnumerator PerGroup(SpawnInfo group)
                             </video>
                         </div>
                     </div>
-                    <!--div class="own-column">
-                        <div>
-                            Results:
-                        </div>
-                        <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                            <source src="assets/video/Roman_Revenant_ClipThree.mp4" type="video/mp4" />
-                        </video>
-                    </div-->
                 </div>
             </div>
         </div>
@@ -245,303 +235,16 @@ public class SpawnManager : MonoBehaviour
                                 </code>
                             </pre>
                         </div>
-                        <!--div class="padding-custom-4"></div>
-                        <button type="button" class="own-collapsible">Enemy.cs</button>
-                        <div class="own-content">
-                            <pre>
-                                <code>
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.AI;
-
-public class Enemy : MonoBehaviour
-{
-    public EnemyData data;
-
-    public AnimationClip dieAnimation;
-
-    [HideInInspector] public string nameOfEnemy;
-    [HideInInspector] public float damageAmount;
-    [HideInInspector] public float enemySpeed;
-    [HideInInspector] public float timeBetweenAttacks;
-    [HideInInspector] public float timeTillHit;
-    [HideInInspector] public float accuracyEnemy;
-    [HideInInspector] public float attackRange;
-
-    [HideInInspector] public float passiveCritChance;
-
-    [HideInInspector] public float abilityCooldown;
-
-    [HideInInspector] public float selfHealAmount;
-
-    [HideInInspector] public float aoeAbilityHealAmount;
-    [HideInInspector] public float aoeAbilityHealRange;
-
-    [HideInInspector] public float enemyBuffChance;
-
-    [HideInInspector] public NavMeshAgent enemyAgent;
-
-    [HideInInspector] public bool canAttackPlayer;
-    [HideInInspector] public bool onAttackCooldown;
-
-    [HideInInspector] public bool isDead;
-
-    [HideInInspector] public bool isInRange;
-
-    [HideInInspector] public Animator animator;
-
-    [SerializeField] private ParticleSystem bloodParticle;
-
-    [HideInInspector] public float enemyMaxHealth;
-
-    private AudioSource deathnoise;
-    private bool playOnce;
-
-    public float enemyHealth;
-    private void Awake()
-    {
-        nameOfEnemy = data.EnemyName;
-        enemyMaxHealth = data.MaxHealth;
-        enemyHealth = enemyMaxHealth;
-        damageAmount = data.Damage;
-        enemySpeed = data.Speed;
-        timeBetweenAttacks = data.AttackFrequency;
-        timeTillHit = data.TimeTillAnimationHit;
-        accuracyEnemy = data.Accuracy;
-        attackRange = data.Range;
-
-        passiveCritChance = data.CritChance;
-
-        abilityCooldown = data.Cooldown;
-
-        selfHealAmount = data.HealAmount;
-        aoeAbilityHealAmount = data.AoeHealAmount;
-        aoeAbilityHealRange = data.AoeHealRange;
-
-        enemyBuffChance = data.BuffChance;
-
-        animator = GetComponent&lt;Animator&gt;();
-        enemyAgent = GetComponent&lt;NavMeshAgent&gt;();
-    }
-
-    public void Heal(float heal)
-    {
-        enemyHealth += heal;
-    }
-
-    public void TakeDamage(float damage)
-    {
-        bloodParticle.Play();
-        enemyHealth -= damage;
-        SoundSystem.Instance.SwingHit();
-        if (enemyHealth &lt;= 0)
-        {
-            
-            StartCoroutine(DieAnimation());
-        }
-    }
-
-    private IEnumerator DieAnimation()
-    {
-        isDead = true;
-        if (!playOnce) 
-        {
-            deathnoise = GetComponent&lt;AudioSource&gt;();
-            deathnoise.Play();
-            playOnce = true;
-        }
-        animator.SetInteger(&quot;Death&quot;, Random.Range(1, 2));
-        damageAmount = 0;
-        enemyAgent.speed = 0;
-        GetComponent&lt;EnemyBuff&gt;().buffedEnemyCanvas.SetActive(false);
-        yield return new WaitForSeconds(dieAnimation.length);
-        Die();
-    }
-    private void Die()
-    {
-        var playerScoreAndMoney = FloatValueManager.Instance;
-        playerScoreAndMoney.CurrentScore += data.ScoreGiven;
-        playerScoreAndMoney.CurrentGold += data.GoldGiven;
-
-        Destroy(gameObject);
-    }
-}
-
-                                </code>
-                            </pre>
-                        </div-->
-                        <!--div class="padding-custom-4"></div>
-                        <button type="button" class="own-collapsible">EnemyMainAttack.cs</button>
-                        <div class="own-content">
-                        <pre>
-                            <code>
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum MainAttacks
-{
-    stab,
-    slash,
-    shoot,
-    snipe
-}
-
-public enum Sniper
-{
-    scope,
-    fire
-}
-public class EnemyMainAttack : MonoBehaviour
-{
-    [SerializeField] GameObject hitRange;
-    [SerializeField] GameObject fireball;
-
-    [SerializeField] Collider enemyHitRange;
-
-    private Enemy enemy;
-    private StateMachine stateMachine;
-    private LazerForSniper lazerForSniper;
-
-    private Sniper sniper;
-
-    private bool isOnAttackCooldown;
-
-    private GameObject currentHitRange;
-    private GameObject currentFireball;
-
-    private HitRangeCollider hitRangeCollider;
-
-    private float angle;
-
-    public bool canTurnToPlayer;
-    public bool canTurnToPredict;
-    private void Awake()
-    {
-        enemy = GetComponent&lt;Enemy&gt;();
-        stateMachine = GetComponent&lt;StateMachine&gt;();
-        lazerForSniper = GetComponentInChildren&lt;LazerForSniper&gt;();
-
-        hitRangeCollider = GetComponentInChildren&lt;HitRangeCollider&gt;();
-    }
-
-    private void Update()
-    {
-        if (currentFireball != null)
-        {
-            currentFireball.transform.position -= new Vector3(0, 8 * Time.deltaTime, 0);
-        }
-        if (angle &gt; 1f &amp;&amp; sniper == Sniper.scope &amp;&amp; canTurnToPlayer)
-        {
-            // Rotate towards the player
-            Vector3 direction = (stateMachine.playerTransform.transform.position - transform.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(direction, Vector3.up);
-            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
-        }
-        if (angle &gt; 1f &amp;&amp; sniper == Sniper.scope &amp;&amp; canTurnToPredict)
-        {
-            // Rotate towards the player
-            Vector3 direction = (lazerForSniper.predictPlayerPosition - transform.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(direction, Vector3.up);
-            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
-        }
-    }
-    public void CheckForDesync()
-    {
-        float number = Random.Range(1, 100);
-        if (number &lt; enemy.accuracyEnemy &amp;&amp; !isOnAttackCooldown)
-        {
-            enemy.animator.SetBool(&quot;Attack&quot;, true);
-            StartCoroutine(AttackCooldown());
-            StartCoroutine(DesyncAttackAnimation());
-        }
-        else if (!isOnAttackCooldown)
-        {
-            enemy.animator.SetBool(&quot;AttackMiss&quot;, true);
-        }
-    }
-
-    private IEnumerator DesyncAttackAnimation()
-    {
-        if (enemy.data.MainAttack == MainAttacks.shoot)
-        {
-            currentHitRange = Instantiate(hitRange, stateMachine.playerTransform.transform.position,
-                stateMachine.playerTransform.transform.rotation);
-            yield return new WaitForSeconds(enemy.timeTillHit);
-
-            currentFireball = Instantiate(fireball, currentHitRange.transform.position +
-                new Vector3(Random.Range(-2.5f, 2.5f), 10, Random.Range(-2.5f, 2.5f)), transform.rotation);
-            Destroy(currentHitRange);
-            yield return new WaitForSeconds(1.5f);
-
-            Destroy(currentFireball);
-        }
-        if (enemy.data.MainAttack == MainAttacks.snipe)
-        {
-            canTurnToPlayer = true;
-            angle = Vector3.Angle(transform.forward, stateMachine.playerTransform.transform.position - transform.position);
-            StartCoroutine(GetComponentInChildren&lt;LazerForSniper&gt;().GetAndSetAllPositions());
-        }
-        else
-        {
-            yield return new WaitForSeconds(enemy.timeTillHit);
-            InColliderRange();
-        }
-    }
-
-    private void InColliderRange()
-    {
-        if (enemyHitRange.bounds.Contains(stateMachine.playerTransform.transform.position) &amp;&amp; 
-            enemy.data.Passives == Passives.crit)
-        {
-            float number = Random.Range(1, 100);
-            if (number &lt; enemy.passiveCritChance)
-            {
-                PlayerHealth player = hitRangeCollider.otherCollider.GetComponent&lt;PlayerHealth&gt;();
-                player.TakeDamage(enemy.damageAmount * Random.Range(2.8f, 3.1f));
-            }
-            else
-            {
-                PlayerHealth player = hitRangeCollider.otherCollider.GetComponent&lt;PlayerHealth&gt;();
-                player.TakeDamage(enemy.damageAmount);
-            }
-        }
-        if (enemyHitRange.bounds.Contains(stateMachine.playerTransform.transform.position) &amp;&amp;
-            enemy.data.Passives != Passives.crit)
-        {
-            PlayerHealth player = hitRangeCollider.otherCollider.GetComponent&lt;PlayerHealth&gt;();
-            player.TakeDamage(enemy.damageAmount);
-        }
-    }
-
-    private IEnumerator AttackCooldown()
-    {
-        isOnAttackCooldown = true;
-        yield return new WaitForSeconds(enemy.timeBetweenAttacks);
-        enemy.animator.SetBool(&quot;Attack&quot;, false);
-        enemy.animator.SetBool(&quot;AttackMiss&quot;, false);
-        stateMachine.GoToDefaultState();
-        stateMachine.ResetTimers();
-        isOnAttackCooldown = false;
-    }
-}
-                            </code>
-                        </pre>
-                        </div-->
-                        <div class="padding-custom-2"></div>
                         <div class="text-center">
                             <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
                             <a class="btn btn-primary" href="bc_x_stw.html">BC X STW</a>
                             <h2 class="text-white-50 mx-auto mt-3 mb-2">or</h2>
-                            <a class="btn btn-primary" href="index.html#projects">Home Page</a>
+                            <a class="mb-9 btn btn-primary" href="index.html#projects">Home Page</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="padding-under-custom"></section>  
         <!-- Footer-->
         <!-- Core theme JS-->
         <script src="js/scripts.js"></script>
