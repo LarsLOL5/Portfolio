@@ -11355,6 +11355,12 @@ input[type=checkbox] {
   filter: brightness(0.8);
   transition: transform 0.25s ease;
   cursor: zoom-in;
+  width: 300px;
+}
+@media (max-width: 750px){
+  .zooming img {
+    width: 200px;
+    }
 }
 
 input[type=checkbox]:checked ~ label > img {
