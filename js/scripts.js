@@ -21,6 +21,28 @@ function filterFunction() {
     }
 }
 
+function getAge() {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const currentDay = new Date().getDate();
+
+    const myBirthYear = 2005;
+    const myBirthMonth = 5;
+    const myBirthDay = 5;
+
+    if (currentMonth == myBirthMonth) {
+        if (currentDay < myBirthDay) {
+            return currentYear - myBirthYear - 1;
+        } else {
+            return currentYear - myBirthYear;
+        }
+    } else if (currentMonth < myBirthMonth) {
+        return currentYear - myBirthYear - 1;
+    } else {
+        return currentYear - myBirthYear;
+    }
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
     // Navbar shrink function

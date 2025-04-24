@@ -218,7 +218,7 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-5">
                         <p class="text-white-50">
-                            Hi, my name is Lars Pluijmakers. I am 19 years old, and I live in Oudkarspel. My hobbies are gaming (obviously), playing chess, and ice skating. 
+                            Hi, my name is Lars Pluijmakers. I am <span id="age"></span> years old, and I live in Oudkarspel. My hobbies are gaming (obviously), playing chess, and ice skating. 
                             My education is Game Developer at the Grafisch Lyceum Utrecht (GLU). If you know Oudkarspel then you will know it's not even close to Utrecht. 
                             So yes, I travel every day to Utrecht and back. It's 2 hours each way, but it's worth it. Because I really like my education and programming has become my passion.
                             <br><br>
@@ -292,6 +292,10 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="js/scripts.js"></script>
+
+        <script>
+            document.getElementById("age").textContent = getAge();
+          </script>
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
     </body>
 </html>
