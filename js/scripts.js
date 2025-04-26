@@ -22,25 +22,16 @@ function filterFunction() {
 }
 
 function getAge() {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const currentDay = new Date().getDate();
+    const date = new Date();
+    const birthDate = new Date(2005, 4, 5);
 
-    const myBirthYear = 2005;
-    const myBirthMonth = 5;
-    const myBirthDay = 5;
+    let age = date.getFullYear() - birthDate.getFullYear();
 
-    if (currentMonth == myBirthMonth) {
-        if (currentDay < myBirthDay) {
-            return currentYear - myBirthYear - 1;
-        } else {
-            return currentYear - myBirthYear;
-        }
-    } else if (currentMonth < myBirthMonth) {
-        return currentYear - myBirthYear - 1;
-    } else {
-        return currentYear - myBirthYear;
+    if (date.getMonth() < birthDate.getMonth() || date.getMonth() === birthDate.getMonth() && date.getDate() < birthDate.getDate()) {
+        age--;
     }
+
+    return age;
 }
 
 window.addEventListener('DOMContentLoaded', event => {
