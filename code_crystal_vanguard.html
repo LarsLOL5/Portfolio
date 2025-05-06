@@ -57,7 +57,238 @@
             </div>
         </header>
         <div class="container col-lg-7 horizontal-line-custom"></div>
-        <!-- Code-->
+                <!-- Code AI-->
+                <div class="container px-8 px-lg-10">
+                    <div class="row gx-4 gx-lg-5 justify-content-center">
+                        <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
+                            <div class="text-center justify-content-center mt-4 mb-1 mx-auto">
+                                <h3>Units AI</h3>
+                                <p>
+                                    In Roman Revenant I made AI behavior for the enemies (see <a href="code_roman_revenant.html">code</a>). But in my next game I wanted to improve the AI. 
+                                    So in this game I did just that. In stead of only making the AI for the enemies, this AI worked for all units, so both friendly and enemy.
+
+                                </p>
+                            </div>
+                            <div class="own-column-100">
+                                <div class="own-code-100">
+                                    <pre>
+                                        <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+public abstract class BaseState
+{
+    public StateHandler stateHandler;
+
+    public BaseState(StateHandler statehandler)
+    {
+        this.stateHandler = statehandler;
+    }
+
+    public virtual void Enter()
+    {
+        
+    }
+
+    public virtual void Exit()
+    {
+
+    }
+
+    public virtual void Update()
+    {
+
+    }
+
+    // Returns the closest unit that hasn't the same id
+    protected (Unit enemy, float distance) GetClosestEnemy()
+    {
+        float closestDistance = float.MaxValue;
+        Unit closestTarget = null;
+        foreach (Unit unit in SpawnManager.Instance.units)
+        {
+            if (unit.factionId == stateHandler.Unit.factionId)
+            {
+                continue;
+            }
+            float magnitude = (stateHandler.transform.position - unit.transform.position).sqrMagnitude;
+            if (magnitude &lt; closestDistance)
+            {
+                closestTarget = unit;
+                closestDistance = magnitude;
+            }
+        }
+
+        if (closestTarget != null)
+        {
+            return (closestTarget, closestDistance);
+        }
+        else
+        {
+            return (null, 0f);
+        }
+    }
+
+    public virtual bool AbsoluteState()
+    {
+        return false;
+    }
+}
+                                        </code>
+                                    </pre>
+                                </div>
+                            </div>
+                            <div class="text-center justify-content-center mt-4 mb-1 mx-auto">
+                                <p>
+                                    So instead of one enum that keeps track of all the states. I have an abstract BaseState that every state can inherit from.
+                                    That way my code keeps clean and readable if I add a lot more states.</br></br>
+                                    The AbsoluteState is a function that has to do with priority.
+                                    If the unit is in a state, for example: attack state. You don't want the unit to cancel their attack animation in the middle of attacking by switching to another state.
+                                    So if the attack state has the AbsoluteState function and it returns true, then if the an other state wants to be the current state, it can't.
+                                </p>
+                            </div>
+                            <div class="own-space-between"></div>
+                            <div class="own-column-100">
+                                <div class="own-code-100">
+                                    <pre>
+                                        <code>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
+
+public class StateHandler : MonoBehaviour
+{
+    public Unit Unit { get; private set; }
+    public BaseState currentState;
+#if UNITY_EDITOR
+    [SerializeField, ReadOnly] private string debugStateActive;
+#endif
+
+    public void SwitchState(BaseState state)
+    {
+        if (currentState == null)
+        {
+            currentState = state;
+            return;
+        }
+        Type stateScriptType = state.GetType();
+        MethodInfo stateMethod = stateScriptType.GetMethod
+            (&quot;AbsoluteState&quot;, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+        if (currentState != null &amp;&amp; !currentState.AbsoluteState() || stateMethod == null)
+        {
+            currentState.Exit();
+            currentState = state;
+            currentState.Enter();
+        }
+    }
+
+    private void Awake()
+    {
+        Unit = GetComponent&lt;Unit&gt;();
+    }
+
+    private void Update()
+    {
+        if (currentState != null)
+        {
+            currentState.Update();
+        }
+#if UNITY_EDITOR
+        if (currentState != null)
+        {
+            debugStateActive = currentState.GetType().Name;
+        }
+        else
+        {
+            debugStateActive = &quot;null&quot;;
+        }
+#endif
+    }
+}
+                                        </code>
+                                    </pre>
+                                </div>
+                            </div>
+                            <div class="text-center justify-content-center mt-4 mb-1 mx-auto">
+                                <p>
+
+                                </p>
+                            </div>
+                            <div class="own-column-100">
+                                <div class="own-code-100">
+                                    <pre>
+                                        <code>
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MoveAndAttackEnemyState : BaseState
+{
+    // This script/state is for both units
+    private Unit currentTarget;
+    private bool canAttack = true;
+
+    public MoveAndAttackEnemyState(StateHandler statehandler) : base(statehandler)
+    {
+        
+    }
+    public override void Update()
+    {
+        if (!stateHandler.Unit.Attack)
+        {
+            return;
+        }
+        (Unit unit, float distance) targetData = GetClosestEnemy();
+        if (targetData.unit != null &amp;&amp; targetData.distance &lt; stateHandler.Unit.unitStats.NoticeRange)
+        {
+            stateHandler.Unit.agent.SetDestination(targetData.unit.transform.position);
+        } else
+        {
+            if (stateHandler.Unit.factionId == 0)
+            {
+                stateHandler.SwitchState(new MoveToGoalState(stateHandler));
+            }
+            else
+            {
+                stateHandler.SwitchState(new WanderState(stateHandler));
+            }
+        }
+        currentTarget = targetData.unit;
+        if (canAttack &amp;&amp; currentTarget != null &amp;&amp; targetData.distance &lt; stateHandler.Unit.unitStats.AttackRange)
+        {
+            Attack();
+        }
+    }
+
+    private void Attack()
+    {
+        canAttack = false;
+        stateHandler.StartCoroutine(AttackCooldown());
+        currentTarget.currentHealth -= stateHandler.Unit.Damage * TypeChart.GetEffectiveness(stateHandler.Unit.Type, currentTarget.Type);
+        Debug.Log(&quot;hit:&quot; + currentTarget + &quot;for:&quot; + stateHandler.Unit.Damage * TypeChart.GetEffectiveness(stateHandler.Unit.Type, currentTarget.Type));
+    }
+
+    private IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(stateHandler.Unit.unitStats.AttackCooldown);
+        canAttack = true;
+    }
+}
+                                        </code>
+                                    </pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <!-- Code Problem/Solution-->
+        <div class="container col-lg-7 horizontal-line-custom"></div>
         <div class="container px-8 px-lg-10">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
