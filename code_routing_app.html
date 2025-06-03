@@ -3,7 +3,7 @@
   <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="Code preview of my game: Roman Revenant" />
+        <meta name="description" content="Code preview of my game: Routing App" />
         <meta name="author" content="Lars Pluijmakers" />
         <title>Code Routing App</title>
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
@@ -52,7 +52,6 @@
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
                         <h1 class="mx-auto my-0 text-uppercase">Code Routing App</h1>
-                        <h4 class="mb-6 text-uppercase">Work in progress!</h4>
                     </div>
                 </div>
             </div>
@@ -62,39 +61,123 @@
         <div class="container px-8 px-lg-10">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-lg-8 col-lg-8 d-flex flex-row flex-wrap align-self-center align-items-center">
+                            <div class="text-center justify-content-center mt-4 mb-1 mx-auto">
+                                <h3>State System</h3>
+                                <p>
+                                    For this system I used the states design pattern (see <a href="https://refactoring.guru/design-patterns/state">pattern</a>). 
+                                    I already had a finite state machine to switch between the different screens. 
+                                    But the more screens I made, the less clear and organized it became. So I refactored it in about a week with the design pattern.
+                                </p>
+                            </div>
                     <div class="own-column">
                         <div class="own-code">
                             <pre>
                                 <code>
-public enum States
+public interface IState
 {
-    chasePlayer,
-    chaseNewPos,
-    attack,
-    abilityUse
+    public void OnEnter(Data data = null);
+    public void Update();
+    public void OnExit();
 }
                                 </code>
                             </pre>
                         </div>
                     </div>
                     <div class="own-column own-text">
-                        This enum has all the possible states the enemy can be in. 
-                        They are in order from top to bottom, with the top having the least priority and the bottom having the most priority.
+                        Every state inherits from this interface class. In the OnEnter you can send data from the Data class, because there is '= null', it's optional.
+                        This way if you want to switch state and for example: the next state needs the current chosen route, you can send that in the data to that state.
                     </div>
                     <div class="own-space-between"></div>
                     <div class="own-column">
                         <div class="own-code">
                             <pre>
                                 <code>
-//Making an reference to the enum
-[SerializeField] States currentState;
-private States defaultState;
-
-
-private void Start()
+public enum EState
 {
-    defaultState = States.chasePlayer;
-    currentState = defaultState;
+    Idle,
+    Init,
+    MainMenu,
+    Database,
+    SearchResults,
+    ChosenRouteChain,
+    Route,
+}
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <div class="own-text">
+                            Each state gets its own enum, which is stored in the AllStates dictionary. So when you want to switch from states, you can give the enum as a parameter.
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <div class="own-code">
+                            <pre>
+                                <code>
+private readonly Dictionary&lt;EState, IState&gt; AllStates = new();
+
+public void Init()
+{
+    RegisterStates();
+    SwitchState(defaultState);
+}
+
+private void RegisterStates()
+{
+    AllStates.Add(EState.Idle, new IdleState());
+    AllStates.Add(EState.Init, new InitState());
+    AllStates.Add(EState.MainMenu, new MainMenuState());
+    AllStates.Add(EState.Database, new DatabaseState());
+    AllStates.Add(EState.SearchResults, new SearchResultsState());
+    AllStates.Add(EState.ChosenRouteChain, new ChosenRouteChainState());
+    AllStates.Add(EState.Route, new RouteState());
+}
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <div class="own-text">
+                            In RegisterStates the classes get linked to a key. So if you access that key, you will get the class. 
+                        </br>
+                            NOTE: Because this class is a singleton without MonoBehaviour, the Init gets called from an other class that initializes all manager classes.
+                        </div>
+                    </div>
+                    <div class="own-column">
+                        <div class="own-code">
+                            <pre>
+                                <code>
+public EState CurrentState { get; private set; }
+public EState PreviousState { get; private set; }
+private readonly EState defaultState = EState.Init;
+
+public void SwitchState(EState state, Data data = null)
+{
+    if (ValidSwitch(state))
+    {
+        PreviousState = CurrentState;
+        AllStates[CurrentState]?.OnExit();
+        CurrentState = state;
+        string previousState = AllStates[PreviousState] != null ? $&quot;{AllStates[PreviousState]}&quot; : &quot;null&quot;;
+        Debug.LogWarning($&quot;Switching from {previousState} to {AllStates[CurrentState]}&quot;);
+        AllStates[CurrentState].OnEnter(data);
+    }
+}
+
+private bool ValidSwitch(EState state)
+{
+    if (!AllStates.ContainsKey(state))
+    {
+        Debug.LogError($&quot;State {state} is not registered.&quot;);
+        return false;
+    }
+    if (CurrentState == state)
+    {
+        Debug.LogWarning($&quot;Already in state {state}. No switch needed.&quot;);
+        return false;
+    }
+    return true;
 }
                                 </code>
                             </pre>
@@ -103,118 +186,35 @@ private void Start()
                     <div class="own-column">
                         <div class="own-column-img">
                             <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                                <source src="assets/video/Roman_Revenant_ClipOne.mp4" type="video/mp4" />
-                            </video>
-                            <script src="https://player.vimeo.com/api/player.js"></script>
-                        </div>
-                        <div class="own-text">
-                            The default state of the enemies. Chasing the player! 
-                            If there is no other state that wants to be activated or if it is done with the other state, it goes to this state.
-                        </div>
-                    </div>
-                    <div class="own-column">
-                        <div class="own-code">
-                            <pre>
-                                <code>
-public void TriggerChaseNewPos()
-{
-    newPosTimer += Time.deltaTime;
-    distanceToNewPos = Vector3.Distance
-    (newPos, enemyNewPosGen.transform.position);
-
-    //If the "ping" goes off
-    if (newPosTimer &gt;= randomTime)
-    {
-        WantsToBeNextState(States.chaseNewPos);
-    }
-
-    //If the new target has been reached, reset timers and state
-    if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
-    {
-        ResetTimers();
-        GoToDefaultState();
-    }
-}
-
-//Priority check
-private void WantsToBeNextState(States possableNewState)
-{
-    if (currentState &lt; possableNewState)
-    {
-        GoToNextState(possableNewState);
-    }
-}
-
-//It becomes the new state
-private void GoToNextState(States newState)
-{
-    currentState = newState;
-}
-                                </code>
-                            </pre>
-                        </div>
-                    </div>
-                    <div class="own-column">
-                        <div class="own-column-img mb-2">
-                            <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
-                                <source src="assets/video/Roman_Revenant_ClipTwo.mp4" type="video/mp4" />
+                                <source src="assets/video/Routing_App_ClipOne.mp4" type="video/mp4" />
                             </video>
                         </div>
                         <div class="own-text">
-                            The second state that the enemy can go to, is the new pos state. 
-                            How it works: randomly there goes a timer off, and the code gives sort of a ping which is like "Hey, I want to be the main state now".
-                            After that ping, it goes through a priority check if the "ping" state is a higher priority than the current state. If it is, it becomes that state.
+                            So when you want to switch states, it first checks if the switch is valid. 
+                            It checks if the enum that you give as a parameter is registered and it checks if it isn't already in that state.
+                            If everything is good, it first does the onExit function from the state you were currently in. 
+                            Then set the CurrentState and PreviousState correctly and last do the onEnter from the new CurrentState.
                         </br></br>
-                            For the other state, ability use, It works the same as the new pos state. But for the other state, the attack state, its "ping" works differently.
-                            The attack state gives a ping if the enemy is within range of the player.
+                        A lot of the time are the click events in the buttons are the ones that do SwitchState, as you can see in the clip above.
                         </div>
                     </div>
                     <div class="own-column">
                         <div class="own-code">
                             <pre>
                                 <code>
-private void StateInfo()
+public class IdleState : IState
 {
-    if (currentState == States.chasePlayer)
+    public void OnEnter(Data data = null)
     {
-        //The enemy is chasing the player
-        enemy.enemyAgent.destination = playerTransform.transform.position;
+        ScreenManager.Instance.Open(EScreen.Idle, data);
     }
-    if (currentState == States.chaseNewPos &amp;&amp; !newPosAlreadyCalledOnce)
+    public void OnExit()
     {
-        /*Function get called for generating new position
-        After that the enemy is chasing that new position (new pos)*/
-        newPosAlreadyCalledOnce = true;
-        newPos = enemyNewPosGen.CreateNewPos();
-        enemy.enemyAgent.destination = newPos;
+        ScreenManager.Instance.Close(EScreen.Idle);
     }
-    if (currentState == States.attack &amp;&amp; !attackAlreadyCalledOnce)
+    public void Update()
     {
-        //Function get called for attacking the player
-        attackAlreadyCalledOnce = true;
-        enemy.enemyAgent.speed = 0f;
-        enemyMainAttack.CheckForDesync();
-    }
-    if (currentState != States.attack &amp;&amp; 
-    currentState != States.abilityUse &amp;&amp; !enemy.isDead)
-    {
-        //Resetting the attack and speed
-        enemy.canAttackPlayer = false;
-        enemy.enemyAgent.speed = enemy.enemySpeed;
-    }
-    if (currentState == States.abilityUse &amp;&amp; !abilityUseAlreadyCalledOnce)
-    {
-        abilityUseAlreadyCalledOnce = true;
-        //Checking if the enemy has an ability
-        if (enemy.data.Ability == EnemyAbilities.none)
-        {
-            GoToDefaultState();
-            ResetTimers();
-            return;
-        }
-        //If he has, call function to activate the ability
-        enemy.enemyAgent.speed = 0;
-        StartCoroutine(enemyAbility.DoAbilityAnimation());
+
     }
 }
                                 </code>
@@ -223,19 +223,17 @@ private void StateInfo()
                     </div>
                     <div class="own-column">
                         <div class="own-text">
-                            This function manages what is going to happen if it's in a certain state. 
-                            I only want the function to be called once in the if statement, so that's why there is a "! -any state- AlreadyCalledOnce" and the end of all the if statements
-                            and a "= true" in the first line in the if statements.
+                            This is an example of how a class that inherits from IState looks like. Right now this state also takes control over the screen, but that's not required.
                         </div>
                     </div>
-                    <div class="own-column">
+                    <!--div class="own-column">
                         <div>
                             Results:
                         </div>
                         <video autoplay muted loop height="400px" class="img-fluid d-flex justify-content-center">
                             <source src="assets/video/Roman_Revenant_ClipThree.mp4" type="video/mp4" />
                         </video>
-                    </div>
+                    </div-->
                 </div>
             </div>
         </div>
@@ -248,212 +246,88 @@ private void StateInfo()
                             |</br>
                             v
                         </h3></br>
-                        <button type="button" class="own-collapsible">StateMachine.cs</button>
+                        <button type="button" class="own-collapsible">StateManager.cs</button>
                         <div class="own-content">
                             <pre>
                                 <code>
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using UnityEngine;
 
-public enum States
+public enum EState
 {
-    chasePlayer,
-    chaseNewPos,
-    attack,
-    abilityUse
+    Idle,
+    Init,
+    MainMenu,
+    Database,
+    SearchResults,
+    ChosenRouteChain,
+    Route,
 }
 
-public class StateMachine : MonoBehaviour
+public class StateManager
 {
-    [HideInInspector] public GameObject playerTransform;
-
-    //Making an reference to the enum
-    [SerializeField] States currentState;
-    private States defaultState;
-
-    [SerializeField] float abilityTimer;
-    private float randomTime;
-    private float newPosTimer;
-
-    private bool newPosAlreadyCalledOnce;
-    private bool attackAlreadyCalledOnce;
-    private bool abilityUseAlreadyCalledOnce;
-
-
-    private Vector3 newPos;
-    private float distanceToNewPos;
-
-    private EnemyNewPosGeneration enemyNewPosGen;
-    private Enemy enemy;
-    private EnemyAbility enemyAbility;
-    private EnemyMainAttack enemyMainAttack;
-
-    private void Start()
+    private static StateManager instance;
+    public static StateManager Instance
     {
-        defaultState = States.chasePlayer;
-        currentState = defaultState;
-        randomTime = UnityEngine.Random.Range(1, 10);
-
-        enemyNewPosGen = GetComponent&lt;EnemyNewPosGeneration&gt;();
-        enemy = GetComponent&lt;Enemy&gt;();
-        enemyAbility = GetComponent&lt;EnemyAbility&gt;();
-        enemyMainAttack = GetComponent&lt;EnemyMainAttack&gt;();
-    }
-
-    private void Update()
-    {
-        if (enemy == null)
+        get
         {
-            return;
-        }
-        if (playerTransform == null)
-        {
-            playerTransform = GameObject.FindWithTag(&quot;Player&quot;);
-        }
-        StateInfo();
-        TriggerChaseNewPos();
-        TriggerAbilityUse();
-        TriggerAttack();
-    }
-
-    public void TriggerChaseNewPos()
-    {
-        newPosTimer += Time.deltaTime;
-        distanceToNewPos = Vector3.Distance
-        (newPos, enemyNewPosGen.transform.position);
-
-        //If the "ping" goes off
-        if (newPosTimer &gt;= randomTime)
-        {
-            WantsToBeNextState(States.chaseNewPos);
-        }
-
-        //If the new target has been reached, reset timers and state
-        if (currentState == States.chaseNewPos &amp;&amp; distanceToNewPos &lt; 1)
-        {
-            ResetTimers();
-            GoToDefaultState();
-        }
-    }
-
-    public void TriggerAttack()
-    {
-        float distance = Vector3.Distance
-        (playerTransform.transform.position, transform.position);
-
-        //If the player is in range
-        if (distance &lt; enemy.attackRange)
-        {
-            WantsToBeNextState(States.attack);
-        }
-
-        //If the player is not in range, reset to default state
-        else if (currentState == States.attack)
-        {
-            currentState = defaultState;
-        }
-    }
-
-    private void TriggerAbilityUse()
-    {
-        abilityTimer += Time.deltaTime;
-
-        //If the "ping" goes off
-        if (abilityTimer &gt;= enemy.abilityCooldown)
-        {
-            WantsToBeNextState(States.abilityUse);
-        }
-
-        if (currentState == States.abilityUse &amp;&amp; enemyAbility.EndAbility)
-        {
-            ResetTimers();
-            GoToDefaultState();
-            enemyAbility.EndAbility = false;
-        }
-    }
-
-    //Priority check
-    private void WantsToBeNextState(States possableNewState)
-    {
-        if (currentState &lt; possableNewState)
-        {
-            GoToNextState(possableNewState);
-        }
-    }
-
-    //It becomes the new state
-    private void GoToNextState(States newState)
-    {
-        currentState = newState;
-    }
-
-    //All info what all the states do
-    private void StateInfo()
-    {
-        if (currentState == States.chasePlayer)
-        {
-            //The enemy is chasing the player
-            enemy.enemyAgent.destination = playerTransform.transform.position;
-        }
-        if (currentState == States.chaseNewPos &amp;&amp; !newPosAlreadyCalledOnce)
-        {
-            /*Function get called for generating new position
-            After that the enemy is chasing that new position (new pos)*/
-            newPosAlreadyCalledOnce = true;
-            newPos = enemyNewPosGen.CreateNewPos();
-            enemy.enemyAgent.destination = newPos;
-        }
-        if (currentState == States.attack &amp;&amp; !attackAlreadyCalledOnce)
-        {
-            //Function get called for attacking the player
-            attackAlreadyCalledOnce = true;
-            enemy.enemyAgent.speed = 0f;
-            enemyMainAttack.CheckForDesync();
-        }
-        if (currentState != States.attack &amp;&amp; 
-        currentState != States.abilityUse &amp;&amp; !enemy.isDead)
-        {
-            //Resetting the attack and speed
-            enemy.canAttackPlayer = false;
-            enemy.enemyAgent.speed = enemy.enemySpeed;
-        }
-        if (currentState == States.abilityUse &amp;&amp; !abilityUseAlreadyCalledOnce)
-        {
-            abilityUseAlreadyCalledOnce = true;
-
-            //Checking if the enemy has an ability
-            if (enemy.data.Ability == EnemyAbilities.none)
+            if (instance == null)
             {
-                GoToDefaultState();
-                ResetTimers();
-                return;
+                instance = new();
             }
-
-            //If he has, call function to activate the ability
-            enemy.enemyAgent.speed = 0;
-            StartCoroutine(enemyAbility.DoAbilityAnimation());
+            return instance;
         }
     }
 
-    //Reset to the default state (chasing the player)
-    public void GoToDefaultState()
+    public EState CurrentState { get; private set; }
+    public EState PreviousState { get; private set; }
+    private readonly EState defaultState = EState.Init;
+
+    private readonly Dictionary&lt;EState, IState&gt; AllStates = new();
+
+    public void Init()
     {
-        currentState = defaultState;
-        newPosAlreadyCalledOnce = false;
-        attackAlreadyCalledOnce = false;
-        abilityUseAlreadyCalledOnce = false;
+        RegisterStates();
+        SwitchState(defaultState);
     }
 
-    //Resetting all timers
-    public void ResetTimers()
+    private void RegisterStates()
     {
-        newPosTimer = 0;
-        randomTime = UnityEngine.Random.Range(1, 10);
-        abilityTimer = 0;
+        AllStates.Add(EState.Idle, new IdleState());
+        AllStates.Add(EState.Init, new InitState());
+        AllStates.Add(EState.MainMenu, new MainMenuState());
+        AllStates.Add(EState.Database, new DatabaseState());
+        AllStates.Add(EState.SearchResults, new SearchResultsState());
+        AllStates.Add(EState.ChosenRouteChain, new ChosenRouteChainState());
+        AllStates.Add(EState.Route, new RouteState());
+    }
+
+    public void SwitchState(EState state, Data data = null)
+    {
+        if (ValidSwitch(state))
+        {
+            PreviousState = CurrentState;
+            AllStates[CurrentState]?.OnExit();
+            CurrentState = state;
+            string previousState = AllStates[PreviousState] != null ? $&quot;{AllStates[PreviousState]}&quot; : &quot;null&quot;;
+            Debug.LogWarning($&quot;Switching from {previousState} to {AllStates[CurrentState]}&quot;);
+            AllStates[CurrentState].OnEnter(data);
+        }
+    }
+
+    private bool ValidSwitch(EState state)
+    {
+        if (!AllStates.ContainsKey(state))
+        {
+            Debug.LogError($&quot;State {state} is not registered.&quot;);
+            return false;
+        }
+        if (CurrentState == state)
+        {
+            Debug.LogWarning($&quot;Already in state {state}. No switch needed.&quot;);
+            return false;
+        }
+        return true;
     }
 }
                                 </code>
