@@ -34,6 +34,32 @@ function getAge() {
     return age;
 }
 
+let isZoomed = false;
+
+function ZoomCodeOnClick() {
+    // Use a data attribute to track zoom state per element
+    if (window.innerWidth < 992) return;
+
+    const isZoomed = this.dataset.zoomed === "true";
+    if (isZoomed) {
+        this.style.transform = 'scale(1)';
+        this.style.width = '100%';
+        this.style.cursor = 'zoom-in';
+        this.style.transition = 'transform 0.3s ease';
+        this.style.position = '';
+        this.style.zIndex = '';
+        this.dataset.zoomed = "false";
+    } else {
+        this.style.transform = 'scale(1.5)';
+        this.style.width = '150%';
+        this.style.cursor = 'zoom-out';
+        this.style.transition = 'transform 0.3s ease';
+        this.style.position = 'relative';
+        this.style.zIndex = '10';
+        this.dataset.zoomed = "true";
+    }
+}
+
 window.addEventListener('DOMContentLoaded', event => {
 
     // Navbar shrink function
@@ -49,6 +75,12 @@ window.addEventListener('DOMContentLoaded', event => {
         }
 
     };
+
+    // Add click event to all .own-code elements
+    document.querySelectorAll('.own-code').forEach(el => {
+        el.addEventListener('click', ZoomCodeOnClick);
+        el.dataset.zoomed = "false"; // Initialize zoom state
+    });
 
     // Shrink the navbar 
     navbarShrink();

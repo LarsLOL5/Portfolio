@@ -11603,16 +11603,14 @@ input[type=checkbox]:checked ~ label > img {
 .own-code {
   padding: 0 18px;
   display: block;
-  /*overflow: hidden;*/
+  cursor: default;
   background-color: rgba(0, 0, 0, 0.045);
   transition: transform .6s !important;
 }
 
 @media (min-width: 992px) {
-.own-code:hover{
+.own-code{
   cursor: zoom-in;
-  transform: scale(1.5);
-  width: 150%;
 }
 }
 
