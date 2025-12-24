@@ -95,25 +95,33 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8">
                         <p class="text-white-50">
-                            This project I worked on in my free time. When I am traveling with public transport I always check the public transport apps.
-                             And I love to bicycle, so that's why I made this app. At first, this app was only ment to be for my bicycle routes.
-                             But the public transport apps don't always work (properly). And my setup was good, so I also added the routes of my buses and trains. 
-                             So now it has routes for everything I use.
+                            I made this project entirely in my free time. At first my goal was to have routes for when I am bicycling. 
+                            I used a user location-based approach for this. It was set up in a way that I could also add routes for my buses/trains, etc. 
+                            But there was one big flaw: your location is not very accurate in the train, especially in the NS Intercity train.
+                            </br></br>
+                            The setup of the entire project was very solid and it is very easy to add or remove states or screens, so I searched for a solution and came across the NS API.
+                            After I implemented the API, I also searched for an API for everything other than the train (buses, trams, etc.)
+                            </br></br>
+                            So I came across another API, OvLive. In combination with the Vertrektijd API I use it to get the information from the rest of the public transport of the Netherlands.
                         </p>
                         <h4 class="text-white mt-4">
                             What challenges did I face?
                         </h4>
                         <p class="text-white-50">
-                            The biggest challenge was to how to set up the entire project. First I thought of ways to do it. So I did some research.
-                            Unity Mapbox? Google Maps API? NS API? But I also wanted the app to work even if you were offline. So the only option left for me was location-based.
-                            And that is exactly what I did. I calculate everything based on the current location.
+                            One challenge was how to set up the entire project. First I thought of ways to do it, so I did some research.
+                            Unity Mapbox? Google Maps API? NS API? But those API's don't have routes for bicycles. 
+                            So the only option left for me was location-based and that is exactly what I did. I calculate everything based on the current location.
+                            </br></br>
+                            Another challenge was knowing how API's work, how to get data from them, etc. But with some research online, I was able to figure everything out.
                         </p>
                         <h4 class="text-white mt-4">
                             What did I learn?
                         </h4>
                         <p class="text-white-50">
-                            I learned how to manage the Unity GPS system. I also learned to code more SOLID and clearer. 
-                            And on a more specific note, how to calculate delays if you have the current point and the distance between 2 points.
+                            I learned how to manage the Unity GPS system and how to code more SOLID and clearer.
+                            On a more specific note, I also learned how to calculate delays if you have the current point and the distance between 2 points.
+                            </br></br>
+                            Later on in the project I also learned how API's work, how to call them and how to get the data in a clean, structured way.
                         </p>
                         <a class="btn btn-primary" href="code_routing_app.html">Code & mechanics</a>
                         <h2 class="text-white-50 mx-auto mt-6 mb-2">Go back</h2>
