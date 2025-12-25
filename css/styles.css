@@ -11655,3 +11655,12 @@ input[type=checkbox]:checked ~ label > img {
 .absoluteee{
   position: relative;
 }
+
+.offset-0-5 {
+  margin-left: 2%;
+}
+
+.infinite-col-lg-4 {
+  flex: 0 0 auto;
+  width: 32%;
+}
